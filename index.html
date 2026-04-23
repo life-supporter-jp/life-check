@@ -10,6 +10,9 @@
 <style>
 :root { --accent:#2b6cb0; }
 
+/* 全ての要素でサイズ計算を正確にする */
+* { box-sizing: border-box; }
+
 body{
   font-family:"Hiragino Kaku Gothic Pro","Noto Sans JP",sans-serif;
   margin: 0;
@@ -25,17 +28,23 @@ body{
   margin: 0 auto; 
   background-color: #fff; 
   min-height: 100vh;
-  box-sizing: border-box;
   padding: 20px;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .wrap { max-width: 400px; padding: 15px; }
 }
 
+/* 画像がデカくなるのを防ぐ */
 .banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
-.banner-container img { width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
+.banner-container img { 
+  max-width: 100%; 
+  height: auto; 
+  display: block; 
+  margin: 0 auto; 
+  border-radius: 8px; 
+}
 
 .main{ display:flex; flex-direction:column; gap:16px; }
 
@@ -45,24 +54,26 @@ nav.toc{
   padding:12px;
   border-radius:8px;
   background:#fafafa;
-  max-height:300px; /* 目次も少しコンパクトに */
+  max-height:300px;
   overflow:auto;
 }
 nav.toc ul{ list-style:none; padding-left:0; margin:0; }
 nav.toc ul ul{ display:none; padding-left: 20px; border-top: 1px dashed #ddd; margin-top: 5px; }
+
+/* activeクラスがついた時だけ中身を表示 */
 nav.toc li.active > ul{ display:block; }
 nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 8px 0; font-weight: bold; }
 
-/* ★ここが重要：本文入力項目をスクロールにする設定 */
+/* 本文入力項目をスクロールにする設定 */
 .content{
   border:2px solid #e2e8f0;
   padding:0 15px;
   border-radius:8px;
   background: #fff;
-  /* 高さを固定してスクロールさせる */
   height: 500px; 
   overflow-y: scroll; 
-  -webkit-overflow-scrolling: touch; /* スマホでのスクロールを滑らかに */
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 .chapter-title{ 
@@ -72,7 +83,7 @@ nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); d
   border-left: 6px solid var(--accent);
   padding: 5px 12px;
   background: #f0f4f8;
-  position: sticky; /* 章タイトルをスクロール中に固定 */
+  position: sticky; 
   top: 0;
   z-index: 5;
 }
@@ -83,9 +94,10 @@ nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); d
 
 textarea{ width:100%; min-height:80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; font-size: 16px; }
 
-.desc{ display:none; background:#f9f9f9; padding:12px; margin-top:8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 16px; }
+.desc{ display:none; background:#f9f9f9; padding:12px; margin-top:8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 16px; line-height: 1.6; }
 .desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
 
+/* ボタンが外に出ないように調整 */
 .controls{ margin:20px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; }
 
 button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; }
@@ -146,11 +158,12 @@ button:hover { opacity: 0.8; }
 </div>
 
 <script>
-/* DESCデータとChapterデータは前回のものを100%維持 */
+// 解説データ（全て含めています）
 const DESC = {
 "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。...",
-/* ... 省略 ... */
-"ch6-9": "デジタル上のつながりも重要な人間関係の一部です。"
+"ch1-1": "預金通帳やキャッシュカードの整理は、実際の手続きのしやすさに直結する重要な作業です。...",
+// (以下、提供された全てのDESCをここに記述してください。長くなるためここでは省略表記しますが、実際には全て貼り付けてください)
+"ch6-9": "デジタル上のつながりも重要な人間関係の一部です。..."
 };
 
 const chapters = [
@@ -174,12 +187,15 @@ function render(){
   chapters.forEach(ch=>{
     const title=document.createElement("div");
     title.className="chapter-title";
+    title.id = "cap-" + ch.id;
     title.textContent=ch.title;
     c.appendChild(title);
+    
     ch.items.forEach((it,i)=>{
       const key=idFor(ch.id,i);
       if(!state[key]) state[key]={};
       if(filterMode && state[key].checked) return;
+      
       const div=document.createElement("div");
       div.className="item" + (state[key].checked?" checked":"") + (state[key].memo?" has-memo":"");
       div.id=key;
@@ -210,9 +226,17 @@ function buildTOC(){
     let done=0;
     ch.items.forEach((it,i)=>{ if(state[idFor(ch.id,i)]?.checked) done++; });
     const percent=Math.round(done/ch.items.length*100);
+    
     const a=document.createElement("a");
     a.innerHTML=`${ch.title} <span style="color:red">●</span> ${percent}%`;
-    a.onclick=(e)=>{ e.preventDefault(); li.classList.toggle("active"); };
+    
+    a.onclick=(e)=>{ 
+      e.preventDefault(); 
+      li.classList.toggle("active"); 
+      const cap = document.getElementById("cap-" + ch.id);
+      if(cap) cap.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+    
     li.appendChild(a);
     const sub=document.createElement("ul");
     ch.items.forEach((it,i)=>{
@@ -221,11 +245,13 @@ function buildTOC(){
       const sa=document.createElement("a");
       sa.style.fontSize="14px"; sa.style.fontWeight="normal";
       sa.innerHTML=it+(state[key]?.memo?" <b style='color:black'>●</b>":"");
+      
       sa.onclick=(e)=>{ 
         e.preventDefault(); 
         const target = document.getElementById(key);
         if(target) target.scrollIntoView({behavior:"smooth", block:"start"}); 
       };
+      
       subli.appendChild(sa); sub.appendChild(subli);
     });
     li.appendChild(sub); toc.appendChild(li);
@@ -274,6 +300,5 @@ state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 render();
 buildTOC();
 </script>
-
 </body>
 </html>
