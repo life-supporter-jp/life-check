@@ -3,90 +3,106 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>終活チェックリスト（詳細解説版）</title>
+<title>終活チェックリスト（完全版）</title>
+
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 <style>
 :root { --accent:#2b6cb0; }
-body { font-family:"Hiragino Kaku Gothic Pro","Noto Sans JP",sans-serif; margin:16px; font-size:18px; color: #333; line-height: 1.6; }
-.wrap { max-width:1200px; margin:auto; }
-.main { display:flex; flex-direction:column; gap:16px; }
-nav.toc { border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; max-height:400px; overflow:auto; }
-nav.toc ul { list-style:none; padding-left:0; margin:0; }
-nav.toc ul ul { display:none; padding-left: 20px; } 
-nav.toc li.active &gt; ul { display:block; } 
-nav.toc li &gt; a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 6px 0; font-weight: bold; }
-nav.toc li ul li a { font-weight: normal; font-size: 16px; color: #444; }
-.content { border:1px solid #eee; padding:12px; border-radius:8px; max-height:65vh; overflow-y:auto; background: #fff; }
-.chapter-title { font-size:22px; font-weight:bold; margin:20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid var(--accent); }
-.item { padding:15px; border: 2px solid #eee; border-radius: 8px; margin-bottom: 10px; transition: 0.2s; }
-.item.checked { background:#e6ffe6; border-color: #48bb78; }
-.item.has-memo { background:#ffe6e6; border-color: #f56565; }
-.item-header { display: flex; align-items: flex-start; gap: 10px; font-weight: bold; }
-.item-header input { transform: scale(1.4); margin-top: 5px; }
-textarea { width:100%; min-height:80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; font-size: 16px; }
-.desc { display:none; background:#f0f7ff; padding:15px; border: 1px solid #b6d4fe; margin: 10px 0; font-size: 16px; border-radius: 5px; color: #084298; text-align: justify; }
-.desc-toggle { color:blue; cursor:pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
-.controls { margin:20px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; }
-button { padding:10px 16px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; }
-.bottom-promo { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
-@media print { .controls, nav.toc, .desc-toggle, .bottom-promo, .guide-box { display: none !important; } .content { max-height: none; overflow: visible; border: none; } .item { page-break-inside: avoid; border: 1px solid #ccc; } }
+
+body{
+  font-family:"Hiragino Kaku Gothic Pro","Noto Sans JP",sans-serif;
+  margin:16px;
+  font-size:18px;
+}
+
+.wrap{ max-width:1200px; margin:auto; }
+
+.main{ display:flex; flex-direction:column; gap:16px; }
+
+/* TOC (目次) */
+nav.toc{
+  border:1px solid #eee;
+  padding:12px;
+  border-radius:8px;
+  background:#fafafa;
+  max-height:400px; /* 少し広げました */
+  overflow:auto;
+}
+nav.toc ul{ list-style:none; padding-left:0; margin:0; }
+
+/* --- 修正箇所：ここから --- */
+nav.toc ul ul{ display:none; padding-left: 20px; } /* 子リストを初期非表示に */
+nav.toc li.active &gt; ul{ display:block; } /* activeクラスで表示 */
+nav.toc li &gt; a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 4px 0; }
+/* --- 修正箇所：ここまで --- */
+
+/* 本文 */
+.content{
+  border:1px solid #eee;
+  padding:12px;
+  border-radius:8px;
+  max-height:65vh;
+  overflow-y:auto;
+}
+
+.chapter-title{ font-size:22px; font-weight:bold; margin:20px 0 10px; }
+
+.item{ padding:12px; border-bottom:1px solid #eee; }
+.item.checked{ background:#e6ffe6; }
+.item.has-memo{ background:#ffe6e6; }
+
+textarea{ width:100%; min-height:80px; }
+
+.desc{ display:none; background:#f5f5f5; padding:8px; margin-top:6px; }
+.desc-toggle{ color:blue; cursor:pointer; }
+
+.controls{ margin:12px 0; display:flex; gap:8px; flex-wrap:wrap; }
+
+button{
+  padding:10px;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:6px;
+}
 </style>
 
+<img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" style="display: block; margin: auto;">
+<p><br></p><div class="wrap">
+<p><font size="5" color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
+<h2 style="text-align:center">マイライフチェック</h2>
+<p>「考えるのは、今。安心するのは、これから。」<br>
+「迷わせない準備が、いちばんの優しさ。」<br>
+「これからを整える、最高の「ありがとう」のために。」</p>
 
+<div class="main">
+  <nav class="toc"><ul id="tocList"></ul></nav>
+  <div class="content" id="contentArea"></div>
+</div>
 
-<div class="wrap">
-  <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" style="display: block; margin: auto; max-width: 100%;">
-  
-  <div style="text-align: center; margin: 20px 0;">
-    <p><font size="5" color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
-    <h2>マイライフチェック</h2>
-  </div>
-
-  <div class="main">
-    <nav class="toc"><ul id="tocList"></ul></nav>
-    <div class="content" id="contentArea"></div>
-  </div>
-
-  <div class="controls">
-    <button onclick="toggleFilter()" style="background:#4a5568;">未完了のみ</button>
-    <button onclick="downloadBackup()">保存</button>
-    <button onclick="loadJSON()">読込</button>
-    <button onclick="exportExcel()">Excel出力</button>
-    <button onclick="importExcel()">Excel読込</button>
-    <button onclick="window.print()" style="background:#1a202c;">印刷</button>
-  </div>
-
-  <div class="guide-box" style="background: #fdf2f2; padding: 15px; border-radius: 8px; font-size: 16px; border: 1px solid #f5c6cb; margin-bottom: 30px;">
-    各項目のチェックをすると<b>緑枠</b>、メモ入力で<b>赤枠</b>になります。<br>
-    目次には進捗率（％）とメモ有無（●）が表示されます。
-  </div>
-
-  <div class="bottom-promo">
-    <span style="font-size: 18px;"><b>今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。</b></span>
-    <p><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: auto; max-width: 100%;"></p>
-    <div style="text-align: center;">
-      <span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span>
-      <p><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px; margin: 10px auto; display: block;"></p>
-      <a href="https://life-supporter.jp/lp/HRSuykFf" style="font-size: 20px; color: blue;">https://life-supporter.jp/lp/HRSuykFf</a>
-    </div>
-  </div>
+<div class="controls">
+<button onclick="toggleFilter()">未完了のみ</button>
+<button onclick="downloadBackup()">保存</button>
+<button onclick="loadJSON()">読込</button>
+<button onclick="exportExcel()">Excel出力</button>
+<button onclick="importExcel()">Excel読込</button>
+<button onclick="window.print()">印刷</button>
 </div>
 
 <input type="file" id="jsonFile" style="display:none">
 <input type="file" id="excelFile" style="display:none">
+<br><br><br>
+<p>各項目のチェックをすると緑枠になります。<br>
+各項目のメモ、コメントを入力すると赤枠になります。<br>
+各項目のメモ、コメントを入力すると章項目の脇に黒丸表示されます。<br>
+各項目のメモ、コメントを入力すると各章赤丸の脇に％表示されます。<br>
+解説ボタンを押すと説明文が表示されます。</p>
 
 <script>
-// --- 全60項目のデータ構造 ---
-const chapters = [
-  { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる","借金・ローンの残高や保証人を明記する","公共料金やサブスクの自動引き落としを整理する","財産目録を作成する","相続税の試算をしておく","遺産分割の希望を整理しておく"]},
-  { id:2, title:"第2章 介護・生活サポート", items:["介護が必要になった時の希望を記録する","介護施設の候補リストを作る","介護保険サービスの利用方法を理解しておく","見守りサービスや生活支援サービスを登録する","日常の家事・買い物支援を手配しておく","緊急連絡網のリストを作る","身元保証人を確保しておく","介護費用の試算をしておく","感謝の手紙を書く","将来の住まいについて決めておく"]},
-  { id:3, title:"第3章 医療・健康管理", items:["かかりつけ医を整理する","持病や服薬の記録を残す","医療保険証をすぐ取り出せる場所に保管する","延命治療に関する意思表示を明記する","臓器提供の意思を示す","入院セットを準備しておく","認知症に備えて成年後見制度や家族信託を検討する","緊急医療情報カードを作成する","健康診断の記録を整理する","在宅医療の体制を確認する"]},
-  { id:4, title:"第4章 心・人生の整理", items:["エンディングノートを作成する","家族や友人への感謝の言葉を書く","思い出の写真や日記を整理する","自分史・年表を作成する","大切な物の譲り先を決める","デジタル遺品を整理する","ペットの世話を託す人を決める","宗教や信仰に関する希望を記録する","心の不安を相談できる人を持つ","趣味や活動の後継者を探す"]},
-  { id:5, title:"第5章 葬儀・供養・死後手続", items:["葬儀の規模を決める","葬儀社の事前相談をして見積もりを取る","お墓の準備を決める","納骨堂や樹木葬の情報を収集する","戒名・法名の希望を伝える","葬儀の音楽や花を指定する","遺影写真を準備しておく","香典の扱いについて希望を明記する","死後の連絡先リストを作る","死亡後の手続きを一覧化しておく"]},
-  { id:6, title:"第6章 デジタル遺産", items:["スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの死後対応","クラウド写真","キャッシュレス決済","仮想通貨・NFT","隠したいデータ","デジタル連絡先"]}
-];
-
-// --- 詳細解説文（リクエスト通り全文を格納） ---
+/* =========================
+   ★解説文（DESC）はそのまま維持
+   ========================= */
 const DESC = {
 "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。自分がどの金融機関にどのような口座を持っているのかを正確に把握していないと、万が一の際に家族が資産を見つけられず、結果として休眠口座になってしまう可能性があります。特に近年はネット銀行の利用が増えており、通帳が存在しないため、本人以外が把握することが難しくなっています。まずは銀行名、支店名、口座種別、口座番号を一覧にまとめましょう。さらに、どの口座を生活用に使っているのか、どの口座が貯蓄用なのかなど用途も記載しておくと、家族が整理しやすくなります。また、定期預金や外貨預金なども漏れなく記録することが重要です。この一覧は紙でもデジタルでも構いませんが、保管場所を家族に伝えておくことが最も大切です。定期的に見直し、新しく口座を開設した場合や解約した場合には必ず更新する習慣をつけましょう。",
 "ch1-1": "預金通帳やキャッシュカードの整理は、実際の手続きのしやすさに直結する重要な作業です。いくら口座一覧を作成していても、通帳やカードの所在が不明では手続きに時間がかかり、家族の負担が増えてしまいます。まずはすべての通帳とカードを一か所に集め、銀行ごとに分けて保管するようにしましょう。その際、使っていない口座の通帳やカードがあれば、この機会に解約を検討することも有効です。不要な口座を減らすことで管理がシンプルになります。また、暗証番号については直接書き残すのではなく、ヒント形式や別管理にするなどセキュリティにも配慮が必要です。さらに、家族が必要なときにすぐ取り出せる場所に保管することが重要ですが、同時に防犯対策も考慮する必要があります。貸金庫の利用や耐火金庫なども選択肢となります。整理された状態を維持するためには、定期的に中身を確認し、最新の状態に保つことが大切です。",
@@ -94,7 +110,7 @@ const DESC = {
 "ch1-3": "保険契約の整理は、万が一の際に確実に保険金を受け取るために非常に重要です。まず、自分が加入しているすべての保険を洗い出し、保険会社名、契約番号、保障内容、保険金額、受取人を一覧にまとめましょう。特に受取人の指定が現在の家族構成と合っているかは必ず確認が必要です。結婚や離婚、家族の変化に応じて見直しがされていないケースも多く、意図しない相手に保険金が渡る可能性もあります。また、古い保険証券は紛失している場合もあるため、再発行や電子化も検討しましょう。家族が手続きを行う際に必要な情報を一か所にまとめておくことで、迅速な対応が可能になります。さらに、不要な保険があれば見直しを行い、保険料の負担を軽減することも大切です。定期的な見直しを行い、常に最新の状態を維持することが安心につながります。",
 "ch1-4": "株式や投資信託、不動産などの資産は、現金と違って見えにくいため、しっかりと情報を整理しておく必要があります。証券会社の口座情報やログイン情報、保有銘柄、評価額などを一覧にしておくことで、家族が資産状況を把握しやすくなります。特にネット証券を利用している場合は、ログイン情報が分からなければ資産の確認すらできないため注意が必要です。不動産については、所在地、登記情報、固定資産税の情報などをまとめておくと手続きがスムーズになります。また、売却の意思や保有を続けるかといった希望も記載しておくと、相続時の判断に役立ちます。これらの資産は価値が変動するため、定期的に見直し、最新の情報に更新しておくことが重要です。家族と共有できる形で管理することが安心につながります。",
 "ch1-5": "借金やローンの情報は、資産と同じくらい重要な情報です。これらを正確に把握していないと、相続時に思わぬ負担が家族にかかる可能性があります。住宅ローンや自動車ローン、カードローンなど、すべての借入先、残高、返済期間、毎月の返済額を一覧にまとめましょう。また、保証人になっている場合も忘れずに記載することが重要です。保証人の情報は見落とされがちですが、将来的に大きな責任が発生する可能性があります。さらに、団体信用生命保険の有無なども確認しておくと、万が一の際の対応が明確になります。これらの情報は家族にとって非常に重要であるため、分かりやすく整理し、必要なときにすぐ確認できる状態にしておくことが大切です。",
-"ch1-6": "公共料金やサブスクリプションサービスの自動引き落としは、見逃されがちですが重要な整理項目です。電気、ガス、水道、通信費、動画配信サービスなど、毎月どのような支払いが発生しているのかを一覧にまとめましょう。特にサブスクリプションは数が増えやすく、本人でも把握しきれていないことがあります。不要なサービスは解約することで、無駄な支出を減らすことができます。また、万が一の際に放置されると、不要な支払いが続いてしまうため、家族が把握できる状態にしておくことが重要です。支払い方法や引き落とし口座も合わせて記録しておくと、解約や変更の手続きがスムーズになります。定期的に見直しを行い、必要なサービスだけを維持することが大切です。",
+"ch1-6": "公共料金やサブスクリプションサービスの自動引き落としは、見落とされがちですが重要な整理項目です。電気、ガス、水道、通信費、動画配信サービスなど、毎月どのような支払いが発生しているのかを一覧にまとめましょう。特にサブスクリプションは数が増えやすく、本人でも把握しきれていないことがあります。不要なサービスは解約することで、無駄な支出を減らすことができます。また、万が一の際に放置されると、不要な支払いが続いてしまうため、家族が把握できる状態にしておくことが重要です。支払い方法や引き落とし口座も合わせて記録しておくと、解約や変更の手続きがスムーズになります。定期的に見直しを行い、必要なサービスだけを維持することが大切です。",
 "ch1-7": "財産目録の作成は、終活において非常に重要な作業の一つです。自分が保有しているすべての資産と負債を一覧にまとめることで、全体像を把握することができます。現金や預金だけでなく、不動産、株式、保険、貴金属なども含めて記載しましょう。また、借入金や未払いの費用なども正確に記載することが重要です。この目録があることで、相続手続きがスムーズになり、家族の負担を大きく軽減することができます。形式は自由ですが、誰が見ても分かるように整理することが大切です。定期的に更新し、最新の状態を維持することが安心につながります。",
 "ch1-8": "相続税の試算を行うことは、将来のトラブルを防ぐために非常に重要です。自分の財産がどの程度あり、どのくらいの税金が発生するのかを把握しておくことで、事前に対策を講じることができます。基礎控除や各種特例を理解し、専門家に相談することも有効です。試算を行うことで、どの程度の現金が必要になるのかが分かり、納税資金の準備にもつながります。また、家族間での認識のズレを防ぐためにも、情報を共有しておくことが大切です。早めに対策を行うことで、負担を軽減することができます。",
 "ch1-9": "遺産分割の希望を事前に整理しておくことは、家族間のトラブルを防ぐために非常に重要です。誰にどの財産をどのように分けたいのか、自分の意思を明確にしておくことで、相続時の混乱を防ぐことができます。遺言書の作成も有効な手段ですが、まずは自分の考えを整理することから始めましょう。また、家族と話し合いを行い、意思を共有しておくことで、納得感のある分割が実現しやすくなります。感情的な対立を防ぐためにも、事前の準備が重要です。定期的に見直し、状況の変化に応じて更新することが望ましいです。",
@@ -150,137 +166,232 @@ const DESC = {
 "ch6-9": "デジタル上のつながりも重要な人間関係の一部です。オンラインのみで交流している友人や知人に対して、万が一の際にどのように連絡を取るのかを考えておくことが大切です。SNSやメールの連絡先を整理し、家族が対応できるようにしておくことで、関係性を大切にすることができます。現代ならではの終活として重要な項目です。"
 };
 
-// --- アプリケーション・ロジック ---
-let state = JSON.parse(localStorage.getItem("shukatsu-check-full-data") || "{}");
-let filterMode = false;
+const chapters = [
+{ id:1, title:"第1章　お金と財産管理", items:[
+"銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約（生命・医療・がん等）の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる",
+"借金・ローンの残高や保証人を明記する","公共料金やサブスクの自動引き落としを整理する","財産目録を作成する","相続税の試算をしておく","遺産分割の希望を整理しておく"
+]},
+{ id:2, title:"第2章　介護・生活サポート", items:[
+"介護が必要になった時の希望（自宅／施設）を記録する","介護施設の候補リストを作る","介護保険サービスの利用方法を理解しておく","見守りサービスや生活支援サービスを登録する","日常の家事・買い物支援を手配しておく",
+"緊急連絡網（家族・親族・医師・近隣）のリストを作る","身元保証人を確保しておく","介護費用の試算をしておく","介護してくれる人への感謝の手紙を書く","将来の住まいについて決めておく"
+]},
+{ id:3, title:"第3章　医療・健康管理", items:[
+"かかりつけ医の情報を整理する","持病や服薬の記録を残す","医療保険証や高齢者医療証をすぐ取り出せる場所に保管する","延命治療に関する意思表示を明記する","臓器提供の意思を示す（ドナーカード等）",
+"入院セットを準備しておく","認知症に備えて成年後見制度や家族信託を検討する","緊急医療情報カードを作成する","健康診断・人間ドックの記録を整理する","在宅医療や訪問診療の体制を確認する"
+]},
+{ id:4, title:"第4章　心・人生の整理", items:[
+"エンディングノートを作成する","家族や友人への感謝の言葉を書く","思い出の写真や日記を整理する","自分史・年表を作成する","大切な物の譲り先を決める",
+"デジタル遺品（PC・スマホ・SNS等）を整理する","ペットの世話を託す人を決める","宗教や信仰に関する希望を記録する","心の不安を相談できる人を持つ","趣味や活動の後継者を探す"
+]},
+{ id:5, title:"第5章　葬儀・供養・死後の手続き", items:[
+"葬儀の規模（家族葬・一般葬・直葬）を決める","葬儀社の事前相談をして見積もりを取る","お墓の準備（新規・改葬・永代供養）を決める","納骨堂や樹木葬の情報を収集する","戒名・法名・俗名の希望を伝える",
+"葬儀で使用したい音楽や花を指定する","遺影写真を準備しておく","香典や供物の扱いについて希望を明記する","死後の連絡先リストを作る（親戚・友人・関係団体など）","死亡後の役所・保険会社等への手続きを一覧化しておく"
+]},
+{ id:6, title:"第6章　デジタル遺産に関する整理をする", items:[
+"スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの死後対応","クラウド写真","キャッシュレス決済","仮想通貨・NFT","隠したいデータ","デジタル連絡先"
+]}
+];
 
-function idFor(chId, i) { return `ch${chId}-${i}`; }
-function save() { localStorage.setItem("shukatsu-check-full-data", JSON.stringify(state)); }
+let state={};
+let filterMode=false;
 
-function render() {
-  const c = document.getElementById("contentArea");
-  c.innerHTML = "";
-  chapters.forEach(ch => {
-    // 章タイトル
-    const titleDiv = document.createElement("div");
-    titleDiv.className = "chapter-title";
-    titleDiv.textContent = ch.title;
-    c.appendChild(titleDiv);
+function idFor(ch,i){return "ch"+ch+"-"+i;}
 
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      if (!state[key]) state[key] = { checked: false, memo: "" };
-      if (filterMode && state[key].checked) return;
+/* ===== 描画 ===== */
+function render(){
+  const c=document.getElementById("contentArea");
+  c.innerHTML="";
 
-      const div = document.createElement("div");
-      div.className = "item" + (state[key].checked ? " checked" : "") + (state[key].memo ? " has-memo" : "");
-      div.id = key;
-      div.innerHTML = `
-        <div class="item-header">
-          <input type="checkbox" id="cb-${key}" ${state[key].checked ? "checked" : ""}>
-          <label for="cb-${key}">${it}</label>
-        </div>
-        <div class="desc-toggle" onclick="toggleDesc('${key}')">▼ 解説をすべて読む</div>
-        <div class="desc" id="desc-${key}">${DESC[key] || "解説文を準備中です。"}</div>
-        <textarea placeholder="メモ・備忘録を入力してください" oninput="updateMemo('${key}', this)">${state[key].memo || ""}</textarea>
+  chapters.forEach(ch=>{
+    const title=document.createElement("div");
+    title.className="chapter-title";
+    title.textContent=ch.title;
+    c.appendChild(title);
+
+    ch.items.forEach((it,i)=>{
+      const key=idFor(ch.id,i);
+      if(!state[key]) state[key]={};
+      if(filterMode && state[key].checked) return;
+
+      const div=document.createElement("div");
+      div.className="item"
+        +(state[key].checked?" checked":"")
+        +(state[key].memo?" has-memo":"");
+
+      div.id=key;
+
+      div.innerHTML=`
+        <input type="checkbox" ${state[key].checked?"checked":""}>
+        ${it}
+        <div class="desc-toggle">▼解説</div>
+        <div class="desc">${DESC[key]||"解説なし"}</div>
+        <textarea>${state[key].memo||""}</textarea>
       `;
 
-      div.querySelector("input").onchange = (e) => {
-        state[key].checked = e.target.checked;
+      const cb=div.querySelector("input");
+      const ta=div.querySelector("textarea");
+
+      cb.onchange=()=>{
+        state[key].checked=cb.checked;
         save(); render(); buildTOC();
       };
+
+      ta.oninput=()=>{
+        state[key].memo=ta.value;
+        save(); buildTOC();
+      };
+
+      div.querySelector(".desc-toggle").onclick=()=>{
+        const d=div.querySelector(".desc");
+        d.style.display=d.style.display==="block"?"none":"block";
+      };
+
       c.appendChild(div);
     });
   });
 }
 
-function toggleDesc(key) {
-  const d = document.getElementById(`desc-${key}`);
-  const btn = d.previousElementSibling;
-  if (d.style.display === "block") {
-    d.style.display = "none";
-    btn.textContent = "▼ 解説をすべて読む";
-  } else {
-    d.style.display = "block";
-    btn.textContent = "▲ 解説を閉じる";
-  }
-}
+/* ===== TOC (目次) 修復版 ===== */
+function buildTOC(){
+  const toc=document.getElementById("tocList");
+  toc.innerHTML="";
 
-function updateMemo(key, el) {
-  state[key].memo = el.value;
-  save(); buildTOC();
-  const parent = document.getElementById(key);
-  parent.className = "item" + (state[key].checked ? " checked" : "") + (state[key].memo ? " has-memo" : "");
-}
+  chapters.forEach(ch=>{
+    const li=document.createElement("li");
 
-function buildTOC() {
-  const toc = document.getElementById("tocList");
-  toc.innerHTML = "";
-  chapters.forEach(ch => {
-    const li = document.createElement("li");
-    let done = 0;
-    ch.items.forEach((_, i) => { if (state[idFor(ch.id, i)]?.checked) done++; });
-    const percent = Math.round((done / ch.items.length) * 100);
+    let total=ch.items.length;
+    let done=0;
 
-    const a = document.createElement("a");
-    a.href = "javascript:void(0)";
-    a.innerHTML = `${ch.title} <span style="color:red">●</span> ${percent}%`;
-    a.onclick = () => li.classList.toggle("active");
+    ch.items.forEach((it,i)=>{
+      if(state[idFor(ch.id,i)]?.checked) done++;
+    });
+
+    const percent=Math.round(done/total*100);
+
+    const a=document.createElement("a");
+    a.href="javascript:void(0)";
+    a.innerHTML=`${ch.title} <span style="color:red">●</span> ${percent}%`;
+
+    // 修正箇所：クリックで active クラスをトグル
+    a.onclick=(e)=>{
+      e.preventDefault();
+      li.classList.toggle("active");
+    };
     li.appendChild(a);
 
-    const sub = document.createElement("ul");
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      const subli = document.createElement("li");
-      const sa = document.createElement("a");
-      sa.href = "javascript:void(0)";
-      sa.innerHTML = it + (state[key]?.memo ? " <span style='color:black'>●</span>" : "");
-      sa.onclick = (e) => {
-        e.stopPropagation();
-        const target = document.getElementById(key);
-        if(target) target.scrollIntoView({ behavior: "smooth", block: "center" });
+    const sub=document.createElement("ul");
+
+    ch.items.forEach((it,i)=>{
+      const key=idFor(ch.id,i);
+
+      const sa=document.createElement("a");
+      sa.href="javascript:void(0)"; // リンクとして動作するように追加
+      sa.innerHTML=it+(state[key]?.memo?" ●":"");
+
+      sa.onclick=(e)=>{
+        e.preventDefault();
+        document.getElementById(key)?.scrollIntoView({behavior:"smooth"});
       };
+
+      const subli=document.createElement("li");
       subli.appendChild(sa);
       sub.appendChild(subli);
     });
+
     li.appendChild(sub);
     toc.appendChild(li);
   });
 }
 
-function toggleFilter() { filterMode = !filterMode; render(); }
-function downloadBackup() {
-  const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "shukatsu_data.json"; a.click();
+/* ===== JSON保存 ===== */
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify(state)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="s-check.json";
+  a.click();
 }
-function loadJSON() { document.getElementById("jsonFile").click(); }
-document.getElementById("jsonFile").onchange = (e) => {
-  const reader = new FileReader();
-  reader.onload = () => { state = JSON.parse(reader.result); save(); render(); buildTOC(); };
-  reader.readAsText(e.target.files[0]);
-};
-function exportExcel() {
-  const data = Object.keys(state).map(k => ({ 項目コード: k, 完了: state[k].checked ? "〇" : "", 内容: state[k].memo }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "終活チェック");
-  XLSX.writeFile(wb, "shukatsu_check.xlsx");
+
+/* ===== JSON読込 ===== */
+function loadJSON(){
+  document.getElementById("jsonFile").click();
 }
-function importExcel() { document.getElementById("excelFile").click(); }
-document.getElementById("excelFile").onchange = (e) => {
-  const reader = new FileReader();
-  reader.onload = (evt) => {
-    const wb = XLSX.read(evt.target.result, { type: "binary" });
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    rows.forEach(r => { if(r.項目コード) state[r.項目コード] = { checked: r.完了 === "〇", memo: r.内容 || "" }; });
+
+document.getElementById("jsonFile").onchange=(e)=>{
+  const file=e.target.files[0];
+  const reader=new FileReader();
+  reader.onload=()=>{
+    state=JSON.parse(reader.result);
     save(); render(); buildTOC();
   };
-  reader.readAsBinaryString(e.target.files[0]);
+  reader.readAsText(file);
 };
 
-// 実行
+/* ===== Excel出力 ===== */
+function exportExcel(){
+  const data=[];
+  for(let key in state){
+    data.push({
+      項目:key,
+      完了:state[key].checked?"〇":"",
+      メモ:state[key].memo||""
+    });
+  }
+  const ws=XLSX.utils.json_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"チェック");
+  XLSX.writeFile(wb,"s-check.xlsx");
+}
+
+/* ===== Excel読込 ===== */
+function importExcel(){
+  document.getElementById("excelFile").click();
+}
+
+document.getElementById("excelFile").onchange=(e)=>{
+  const file=e.target.files[0];
+  const reader=new FileReader();
+  reader.onload=(evt)=>{
+    const wb=XLSX.read(evt.target.result,{type:"binary"});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const data=XLSX.utils.sheet_to_json(ws);
+
+    data.forEach(row=>{
+      state[row.項目]={
+        checked:row.完了==="〇",
+        memo:row.メモ||""
+      };
+    });
+
+    save(); render(); buildTOC();
+  };
+  reader.readAsBinaryString(file);
+};
+
+/* ===== その他 ===== */
+const STORAGE_KEY = "s-check-" + location.pathname;
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function toggleFilter(){
+  filterMode=!filterMode;
+  render();
+}
+
+state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
 render();
 buildTOC();
-</script>
 
+</script>
+</div>
+<span style="font-size: 18px;"><b>今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。</b></span><p><br></p>
+<p><span style="font-size: 18px;"><b></b></span>
+
+<img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: auto;"><br></p><p><br></p>
+<span style="font-size: 24px;"><div style="text-align: center;"><b>以下より体験版をご確認ください。</b></div>
+</span><p style="text-align: center; "><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;"></p>
+<div style="text-align: center;"><a href="https://life-supporter.jp/lp/HRSuykFf" style="background-color: rgb(255, 255, 255); font-family: &quot;Hiragino Kaku Gothic Pro&quot;, &quot;Noto Sans JP&quot;, sans-serif;"><span style="font-size: 20px; color: rgb(0, 0, 255);">https://life-supporter.jp/lp/HRSuykFf</span></a></div>
+<p><br></p>
