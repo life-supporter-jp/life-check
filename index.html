@@ -4,114 +4,63 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>終活チェックリスト</title>
-
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
-
-body {
-  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5;
-}
-
-.wrap { 
-  max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh;
-  padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
-}
-
-/* 目次 */
-nav.toc {
-  border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa;
-  max-height: 350px; overflow-y: auto; margin-bottom: 20px;
-}
+body { font-family: "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5; }
+.wrap { max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh; padding: 20px; }
+nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 250px; overflow-y: auto; margin-bottom: 20px; }
 nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
 nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
-
-/* 本文エリア */
-.content {
-  border: 2px solid #e2e8f0; padding: 0 15px; border-radius: 8px; background: #fff;
-  height: 500px; overflow-y: scroll; -webkit-overflow-scrolling: touch;
-}
-
-.chapter-title { 
-  font-size: 20px; font-weight: bold; margin: 25px 0 10px; border-left: 6px solid var(--accent);
-  padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5;
-}
-
+.content { border: 2px solid #e2e8f0; padding: 0 15px; border-radius: 8px; height: 450px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+.chapter-title { font-size: 20px; font-weight: bold; margin: 25px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; }
 textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; }
-
-/* ボタンエリア */
 .controls { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 button { padding: 15px; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; min-width: 140px; }
-
-/* 高齢者向け保存確認エリア */
-.save-confirm-box {
-  display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;
-}
+.save-confirm-box { display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; }
 .file-display { font-size: 24px; font-weight: bold; color: #000; background: #eee; padding: 10px; border-radius: 6px; display: inline-block; margin: 15px 0; }
-
-.footer-msg { margin-top: 30px; font-size: 14px; background: #eef; padding: 15px; border-radius: 10px; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <div style="text-align: center;">
-    <h2 style="font-size: 24px; margin: 10px 0;">マイライフチェック</h2>
-  </div>
+  <h2 style="text-align: center; font-size: 24px;">マイライフチェック</h2>
 
   <div class="main">
-    <nav class="toc">
-      <p style="font-size: 14px; color: #666;">▼ 項目を選んでください</p>
-      <ul id="tocList"></ul>
-    </nav>
+    <nav class="toc"><ul id="tocList"></ul></nav>
     <div class="content" id="contentArea"></div>
   </div>
 
   <div id="saveConfirm" class="save-confirm-box">
     <p style="margin:0; font-size:18px;">保存する名前：</p>
     <div class="file-display">life-check.json</div>
-    <button style="width:100%; background:#e53e3e; font-size:20px; margin-bottom:10px;" onclick="executeDownload()">この名前で保存を確定する</button>
+    <button style="width:100%; background:#e53e3e; font-size:22px; margin-bottom:10px;" onclick="executeDownload()">この名前で保存を確定する</button>
     <button style="background:none; border:none; color:blue; text-decoration:underline; font-size:16px;" onclick="cancelSave()">取り消す</button>
   </div>
 
   <div class="controls" id="normalControls">
     <button onclick="startSaveProcess()" style="background: #e53e3e; width: 100%; font-size: 20px;">今の内容を保存する</button>
-    <button onclick="document.getElementById('jsonFile').click()" style="background: #718096;">保存データを開く</button>
-    <button onclick="exportExcel()" style="background: #2f855a;">Excel（表）で出す</button>
-    <button onclick="window.print()" style="background: #1a202c;">印刷する</button>
-  </div>
-
-  <div class="footer-msg">
-    <b>【iPhoneをお使いの方へ】</b><br>
-    「確定」を押した後に画面に「ダウンロードしますか？」と出たら、必ず「ダウンロード」を押してください。保存したものは、ホーム画面にある青い<b>「ファイル」</b>というアプリの中にあります。
+    <button onclick="document.getElementById('jsonFile').click()" style="background: #718096;">保存したデータを開く</button>
+    <button onclick="exportExcel()" style="background: #2f855a;">Excel（表）を保存</button>
   </div>
 
   <input type="file" id="jsonFile" style="display:none" onchange="loadJSON(event)">
 </div>
 
 <script>
-// 章と項目のデータ
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧","通帳・カード整理","年金手続き","保険整理","資産情報","借金・ローン","公共料金","財産目録","相続税試算","遺産分割希望"]},
-  { id:2, title:"第2章 介護・サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡先","身元保証人","介護費用試算","感謝の手紙","住まい"]},
-  { id:3, title:"第3章 医療・健康管理", items:["かかりつけ医","持病・服薬記録","保険証保管","延命治療の意思","臓器提供","入院セット","後見制度","緊急情報カード","検診記録","在宅医療"]},
-  { id:4, title:"第4章 心・人生の整理", items:["エンディングノート","感謝の言葉","写真・日記整理","自分史作成","形見分け","デジタル遺品","ペットの世話","宗教・信仰","相談相手","趣味の後継者"]},
-  { id:5, title:"第5章 葬儀・供養", items:["葬儀の規模","葬儀社の相談","お墓の準備","納骨堂・樹木葬","戒名・法名","演出・音楽","遺影写真","香典・供物","連絡先リスト","死後の手続き"]},
-  { id:6, title:"第6章 デジタル遺産", items:["スマホ・PCロック","ID・パスワード","ネット銀行","サブスク解約","SNS対応","クラウド写真","電子マネー","仮想通貨","隠したいデータ","デジタル連絡先"]}
+  { id:2, title:"第2章 介護・サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡先","身元保証人","介護費用試算","感謝の手紙","住まい"]}
 ];
 
-// 保存キー（URLごとに分ける）
-const SAVE_KEY = "shukatsu-save-" + location.pathname;
+const SAVE_KEY = "shukatsu-save-v1";
 let state = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// 画面の表示
 function render(){
   const c = document.getElementById("contentArea");
   c.innerHTML = "";
@@ -125,30 +74,21 @@ function render(){
       if(!state[key]) state[key] = {checked:false, memo:""};
       const div = document.createElement("div");
       div.className = "item" + (state[key].checked?" checked":"");
-      div.id = key;
-      div.innerHTML = `
-        <input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b><br>
-        <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
-      `;
+      div.innerHTML = `<input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b><br><textarea>${state[key].memo || ""}</textarea>`;
       div.querySelector("input").onchange = (e) => { state[key].checked = e.target.checked; saveLocal(); render(); };
-      div.querySelector("textarea").oninput = (e) => { state[key].memo = e.target.value; saveLocal(); };
+      div.querySelector("textarea").onblur = (e) => { state[key].memo = e.target.value; saveLocal(); }; // blurで確実に確定
       c.appendChild(div);
     });
   });
 }
 
-// 目次の作成
 function buildTOC(){
   const toc = document.getElementById("tocList");
-  toc.innerHTML = "";
   chapters.forEach(ch => {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.textContent = ch.title;
-    a.onclick = () => {
-      const target = document.getElementById("cap-" + ch.id);
-      document.getElementById(idFor(ch.id, 0)).scrollIntoView({behavior:"smooth"});
-    };
+    a.onclick = () => { document.querySelectorAll('.chapter-title')[ch.id-1].scrollIntoView({behavior:"smooth"}); };
     li.appendChild(a);
     toc.appendChild(li);
   });
@@ -156,72 +96,50 @@ function buildTOC(){
 
 function saveLocal(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
-// 【保存の手順】1.確認画面を出す
 function startSaveProcess() {
-  document.getElementById('saveConfirm').style.display = 'block';
-  document.getElementById('normalControls').style.display = 'none';
-  document.getElementById('saveConfirm').scrollIntoView({behavior: 'smooth'});
+  document.activeElement.blur(); // 入力中のキーボードを閉じてデータを確定させる
+  setTimeout(() => {
+    document.getElementById('saveConfirm').style.display = 'block';
+    document.getElementById('normalControls').style.display = 'none';
+  }, 100);
 }
 
-// 【保存の手順】2.取り消し
 function cancelSave() {
   document.getElementById('saveConfirm').style.display = 'none';
   document.getElementById('normalControls').style.display = 'flex';
 }
 
-// 【保存の手順】3.iPhoneに強制ダウンロードさせる実行処理
 function executeDownload() {
-  const dataStr = JSON.stringify(state, null, 2);
-  
-  // application/octet-streamにすることで、iPhoneに「表示」ではなく「保存」を強制させます
-  const blob = new Blob([dataStr], {type: "application/octet-stream"});
+  const dataStr = JSON.stringify(state);
+  const blob = new Blob([dataStr], {type: "application/json"});
   const url = URL.createObjectURL(blob);
-  
   const a = document.createElement("a");
   a.href = url;
   a.download = "life-check.json";
   document.body.appendChild(a);
   a.click();
-  
   setTimeout(() => {
     document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    alert("保存の命令を出しました。画面に『ダウンロードしますか？』と出たら、必ず『ダウンロード』を押してください。");
+    URL.revokeObjectURL(url);
+    alert("保存しました。次に『データを開く』時は、最新の『life-check.json』を選んでください。");
     cancelSave();
   }, 500);
 }
 
-// データの読み込み
 function loadJSON(event){
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
-      state = JSON.parse(e.target.result);
-      saveLocal(); 
-      render();
-      alert("保存されていた内容を読み込みました。");
-    } catch(err) {
-      alert("正しいファイル（life-check.json）を選んでください。");
-    }
+      const loaded = JSON.parse(e.target.result);
+      if(Object.keys(loaded).length === 0) { alert("ファイルの中身が空です。"); return; }
+      state = loaded;
+      saveLocal(); render();
+      alert("読み込みに成功しました。");
+    } catch(err) { alert("失敗しました。正しいファイルを選んでください。"); }
   };
   reader.readAsText(file);
-}
-
-// Excel出力
-function exportExcel(){
-  const data = [];
-  chapters.forEach(ch => {
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      data.push({ 章: ch.title, 項目: it, 完了: state[key].checked ? "〇" : "", メモ: state[key].memo });
-    });
-  });
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "終活データ");
-  XLSX.writeFile(wb, "life-check.xlsx");
 }
 
 render();
