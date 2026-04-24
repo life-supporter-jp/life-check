@@ -14,50 +14,53 @@ body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hirag
 .wrap { max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
 @media (max-width: 800px) { .wrap { max-width: 100%; padding: 10px; } }
 
-.banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
+/* 画像表示の修正 */
+.banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
+.banner-container img { max-width: 100%; height: auto; display: inline-block; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-/* 目次・本文（元のデザインを維持） */
+/* 目次 */
 nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 350px; overflow-y: auto; margin-bottom: 20px; }
 nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
 nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
 nav.toc ul ul { display: none; padding-left: 15px; }
 nav.toc li.active > ul { display: block; }
 
-/* コンテンツエリア：スクロールの下にボタンを置くため、高さを自動に */
+/* 重要：コンテンツエリアを「高さ自動」にして、ボタンを一番下へ */
 .content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; margin-bottom: 20px; }
-.chapter-title { font-size: 18px; font-weight: bold; margin: 20px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
+.chapter-title { font-size: 18px; font-weight: bold; margin: 30px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 
+/* 元の解説デザインを維持 */
 .desc { display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; }
 .desc-toggle { color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; margin: 5px 0; display: inline-block; }
 
 textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; font-family: inherit; }
 
-/* 操作ボタン：正確な6個をページ最下部に配置 */
-.controls { margin: 30px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 20px 0; border-top: 2px solid #eee; }
-button { padding: 12px 8px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 140px; font-size: 14px; min-width: 120px; }
+/* 操作ボタン：ページの最下部に配置 */
+.controls { margin: 40px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 25px 0; border-top: 2px solid #eee; }
+button { padding: 14px 10px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 140px; font-size: 14px; min-width: 120px; }
 button:active { opacity: 0.7; }
 
-/* スマホ用保存案内 */
 .save-guide { display: none; background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; font-weight: bold; color: #c53030; }
 
-.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 15px; }
+.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 15px; border: 1px solid #eee; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <div class="banner-container">
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg">
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" alt="マイライフチェック バナー">
   </div>
 
   <div style="text-align: center;">
-    <h2 style="margin: 10px 0;">マイライフチェック</h2>
+    <h1 style="margin: 10px 0; font-size: 24px;">マイライフチェック</h1>
   </div>
 
   <div class="main">
     <nav class="toc"><ul id="tocList"></ul></nav>
+    
     <div class="content" id="contentArea"></div>
   </div>
 
@@ -76,7 +79,7 @@ button:active { opacity: 0.7; }
 
   <div class="footer-info">
     <p><b>終活・ライフプランのご案内</b></p>
-    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。スマホのIDやパスワードを安全に管理しましょう。</p>
+    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。</p>
     <a href="https://life-supporter.jp/lp/HRSuykFf" target="_blank">詳細はこちら（体験版サイト）</a>
   </div>
 
@@ -85,6 +88,7 @@ button:active { opacity: 0.7; }
 </div>
 
 <script>
+// --- データ定義 ---
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
@@ -94,6 +98,7 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホ等のロック解除","ID・パスワード保管","ネット銀行・証券","サブスク解約リスト","SNSの死後対応","クラウド写真の整理","キャッシュレス決済","暗号資産・NFT","非公開データの処理","デジタル連絡先"]}
 ];
 
+// 解説テキスト（全項目完備）
 const DESC = {
   "ch1-0": "休眠口座を防ぐため、銀行名・支店名・口座番号を一覧にします。",
   "ch1-1": "紛失時に備え、保管場所を信頼できる家族に伝えておきます。",
@@ -159,11 +164,11 @@ const DESC = {
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-v2026-fixed";
+const STORAGE_KEY = "life-check-v2026-v2";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// --- スマホ対応保存 ---
+// 保存機能
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
