@@ -17,15 +17,19 @@ body{ font-family:sans-serif; margin:0; padding:0; font-size:18px; color:#333; b
 .banner-container img { max-width:100%; height:auto; display:block; margin:0 auto; border-radius:8px; }
 
 .main{ display:flex; flex-direction:column; gap:16px; margin-top:20px; }
+
+/* 目次のスタイル */
 nav.toc{ border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; max-height:400px; overflow-y:auto; }
 nav.toc ul { list-style: none; padding: 0; margin: 0; }
 nav.toc li > a { cursor:pointer; text-decoration:none; color:var(--accent); display:block; padding:12px 0; font-weight:bold; border-bottom: 1px solid #eee; }
 nav.toc ul ul{ display:none; padding-left:20px; border-top: 1px dashed #ddd; }
 nav.toc li.active > ul{ display:block; }
-/* 目次の子項目をクリックしやすく */
-nav.toc ul ul li a { display: block; padding: 8px 0; color: #555; font-size: 14px; text-decoration: none; cursor: pointer; }
-nav.toc ul ul li a:hover { text-decoration: underline; color: var(--accent); }
 
+/* 10項目のリンクを見やすく */
+.toc-sub-item { display: block; padding: 10px 0; color: #555; font-size: 15px; text-decoration: none; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+.toc-sub-item:active { background-color: #e2e8f0; }
+
+/* 入力エリア */
 .content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; background: #fff; scroll-behavior: smooth; }
 .chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
 
@@ -93,7 +97,7 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
-  { id:3, title:"第3章 医療・健康管理", items:["かかりつけ医整理","持病・服薬記録","医療保険証の保管","延命治療の意思表示","臓器提供の意思","入院セット準備","成年後見の検討","緊急医療カード作成","健康診断記録整理","在宅医療体制確認"]},
+  { id:3, title:"第3章 医療・健康管理", items:["かかけ医整理","持病・服薬記録","医療保険証の保管","延命治療の意思表示","臓器提供の意思","入院セット準備","成年後見の検討","緊急医療カード作成","健康診断記録整理","在宅医療体制確認"]},
   { id:4, title:"第4章 心・人生の整理", items:["エンディングノート","家族への感謝の言葉","写真・日記の整理","自分史・年表作成","大切な物の譲り先","デジタル遺品整理","ペットの世話依頼","宗教・信仰の希望","心の不安相談相手","趣味活動の後継者"]},
   { id:5, title:"第5章 葬儀・供養・死後の手続き", items:["葬儀の規模決定","葬儀社の事前相談","お墓の準備決定","納骨・供養の収集","戒名・法名の希望","音楽・花の指定","遺影写真の準備","香典・供物の扱い","死後の連絡先リスト","死後の手続き一覧"]},
   { id:6, title:"第6章 デジタル遺産", items:["スマホ等のロック解除","ID・パスワード保管","ネット銀行・証券","サブスク解約リスト","SNSの死後対応","クラウド写真の整理","キャッシュレス決済","暗号資産・NFT","非公開データの処理","デジタル連絡先"]}
@@ -108,7 +112,8 @@ const EXPLANATIONS = {
 let state = JSON.parse(localStorage.getItem("life-check-v100") || "{}");
 let filterMode = false;
 
-function idFor(chId, i){ return "item-" + chId + "-" + i; }
+// ユニークなIDを生成
+function idFor(chId, i){ return "jump-target-" + chId + "-" + i; }
 
 // --- 画面描画 ---
 function render(){
@@ -129,9 +134,9 @@ function render(){
       
       const itemDiv = document.createElement("div");
       itemDiv.className = "item" + (state[key].checked ? " checked" : "");
-      itemDiv.id = key; // ジャンプ用のIDを設定
+      itemDiv.id = key; // ここにIDを振ることで、目次から飛べるようにする
       
-      const expText = EXPLANATIONS[key] || "この項目の準備状況を確認し、必要があればメモを残してください。";
+      const expText = EXPLANATIONS["ch" + ch.id + "-" + i] || "この項目の準備状況を確認し、必要があればメモを残してください。";
       
       itemDiv.innerHTML = `
         <label style="display: block; cursor: pointer;">
@@ -161,11 +166,11 @@ function toggleDesc(key){
   if(el) el.style.display = (el.style.display === "block") ? "none" : "block";
 }
 
-// 目次をクリックした時のジャンプ処理
-function scrollToItem(id) {
-  const target = document.getElementById(id);
-  if (target) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+// 目次から該当項目へジャンプする関数
+function jumpTo(targetId) {
+  const el = document.getElementById(targetId);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -178,21 +183,26 @@ function buildTOC(){
     ch.items.forEach((_, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
     const percent = Math.round(done / ch.items.length * 100);
     
+    // 章タイトル（クリックで10項目を開閉）
     const a = document.createElement("a");
     a.innerHTML = `${ch.title} <span style="color:red">●</span> ${percent}%`;
     a.onclick = () => { li.classList.toggle("active"); };
-    
     li.appendChild(a);
+
     const ul = document.createElement("ul");
     ch.items.forEach((itemText, i) => {
       const subli = document.createElement("li");
-      const subA = document.createElement("a");
+      const subA = document.createElement("span");
       const key = idFor(ch.id, i);
-      subA.textContent = itemText + (state[key]?.memo ? " ✍" : "");
+      subA.className = "toc-sub-item";
+      subA.textContent = "・" + itemText + (state[key]?.memo ? " (メモ有)" : "");
+      
+      // ここでジャンプ機能を実行
       subA.onclick = (e) => {
-        e.stopPropagation(); // 章の開閉を防ぐ
-        scrollToItem(key);
+        e.stopPropagation(); // 章が閉じるのを防ぐ
+        jumpTo(key);
       };
+      
       subli.appendChild(subA);
       ul.appendChild(subli);
     });
@@ -203,7 +213,7 @@ function buildTOC(){
 
 function save(){ localStorage.setItem("life-check-v100", JSON.stringify(state)); }
 
-// --- ファイル操作 ---
+// --- ファイル操作（Excel出力・保存など） ---
 async function downloadBackup(){
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
   const f = new File([blob], "life-check.json", {type:"application/json"});
@@ -221,13 +231,13 @@ document.getElementById("jsonFile").onchange = (e) => {
     try {
       state = JSON.parse(reader.result); 
       save(); render(); buildTOC(); 
-    } catch(err) { alert("有効なJSONファイルではありません。"); }
+    } catch(err) { alert("データ形式が正しくありません。"); }
   };
   reader.readAsText(e.target.files[0]);
 };
 
 async function exportExcel(){
-  if(typeof XLSX === 'undefined') { alert("ライブラリ読込中..."); return; }
+  if(typeof XLSX === 'undefined') { alert("準備中..."); return; }
   const data = [];
   chapters.forEach(ch => { 
     ch.items.forEach((itemText, i) => {
@@ -241,9 +251,8 @@ async function exportExcel(){
   const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
   const blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
   const f = new File([blob], "life-check.xlsx", {type:blob.type});
-
   if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
-    try{ await navigator.share({files:[f], title:"エクセル出力"}); }catch(e){
+    try{ await navigator.share({files:[f], title:"Excel出力"}); }catch(e){
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
     }
   } else {
@@ -273,6 +282,7 @@ document.getElementById("excelFile").onchange = (e) => {
 
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
+// 実行
 render();
 buildTOC();
 </script>
