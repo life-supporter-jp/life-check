@@ -32,8 +32,16 @@ nav.toc ul ul{ display:none; }
 .content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; background: #fff; scroll-behavior: smooth; }
 .chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
 
-/* 項目スタイル 【調整】ジャンプ時の余白を確保するためpadding-topを60pxに増加、項目間の余白(margin)も追加 */
-.item{ padding:60px 20px 30px 20px; border: 2px solid transparent; border-bottom: 2px solid #edf2f7; transition: all 0.3s; margin-bottom: 20px; border-radius: 8px; }
+/* 項目スタイル 【スマホ対策】padding-topを80pxに増やし、scroll-margin-topでジャンプ位置を調整 */
+.item{ 
+  padding: 80px 20px 30px 20px; 
+  scroll-margin-top: 50px; 
+  border: 2px solid transparent; 
+  border-bottom: 2px solid #edf2f7; 
+  transition: all 0.3s; 
+  margin-bottom: 25px; 
+  border-radius: 8px; 
+}
 
 /* チェックを入れたら緑枠・出来ている */
 .item.checked{ background:#e6ffe6; border: 3px solid #4caf50 !important; }
