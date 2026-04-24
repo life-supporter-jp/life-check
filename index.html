@@ -32,17 +32,17 @@ nav.toc ul ul{ display:none; }
 .content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; background: #fff; scroll-behavior: smooth; }
 .chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
 
-/* 項目スタイル 【修正】ジャンプした時に上に余裕を持たせるため、padding-topを調整 */
-.item{ padding:40px 20px 20px 20px; border: 2px solid transparent; border-bottom: 1px solid #eee; transition: all 0.3s; margin-bottom: 5px; border-radius: 6px; }
+/* 項目スタイル 【調整】ジャンプ時の余白を確保するためpadding-topを60pxに増加、項目間の余白(margin)も追加 */
+.item{ padding:60px 20px 30px 20px; border: 2px solid transparent; border-bottom: 2px solid #edf2f7; transition: all 0.3s; margin-bottom: 20px; border-radius: 8px; }
 
 /* チェックを入れたら緑枠・出来ている */
 .item.checked{ background:#e6ffe6; border: 3px solid #4caf50 !important; }
 
-.desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin: 8px 0; display: inline-block; }
+.desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin: 12px 0; display: inline-block; }
 .desc-body{ display:none; background:#f9f9f9; padding:12px; border:1px dotted #ccc; border-radius:4px; font-size:15px; line-height:1.6; margin-bottom:10px; }
 
 /* 文字を入れたら赤枠 */
-textarea{ width:100%; min-height:80px; margin-top:10px; border:1px solid #ccc; border-radius:4px; padding:10px; font-size:16px; transition: border-color 0.3s; }
+textarea{ width:100%; min-height:100px; margin-top:10px; border:1px solid #ccc; border-radius:4px; padding:10px; font-size:16px; transition: border-color 0.3s; }
 textarea.has-text { border: 2px solid #ff0000 !important; outline: none; }
 
 .controls{ margin:25px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; border-bottom:2px solid #eee; padding-bottom:20px; }
@@ -143,7 +143,7 @@ const DESC = {
 "ch5-1": "葬儀社の事前相談は、費用やサービス内容を把握するために非常に有効です...",
 "ch5-2": "お墓についての準備は、後の世代の負担を軽減するためにも重要です...",
 "ch5-3": "納骨堂や樹木葬は、従来のお墓に代わる供養の方法として注目されています...",
-"ch5-4": "戒名や法名は宗教的な意味を持つ名前であり、葬儀や供養において重要な要素となります...",
+"ch5-4": "戒名や法名は宗教的な名字を持つ名前であり、葬儀や供養において重要な要素となります...",
 "ch5-5": "葬儀の演出として、音楽や花の指定を行うことは、自分らしさを表現する一つの方法です...",
 "ch5-6": "遺影写真は葬儀の際に重要な役割を果たします...",
 "ch5-7": "香典や供物の取り扱いについては、地域や家庭によって考え方が異なるため、事前に希望を明確にしておくことが重要です...",
