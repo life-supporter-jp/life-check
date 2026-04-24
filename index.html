@@ -89,11 +89,16 @@ button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; bo
     <div class="content" id="contentArea"></div>
   </div>
 
-  <div class="controls">
+ <div class="controls">
   <button onclick="toggleFilter()" style="background: #555;">未完了のみ</button>
-  <button id="btnSave" onclick="downloadBackup()">データ保存</button>
+  
+  <a id="downloadLink" style="display:none;"></a>
+  <button onclick="handleDownload()">データ保存</button>
+  
   <button onclick="loadJSON()" style="background: #718096;">データ読込</button>
-  <button id="btnExcel" onclick="exportExcel()" style="background: #2f855a;">Excel出力</button>
+  
+  <button onclick="exportExcel()">Excel出力</button>
+  
   <button onclick="importExcel()" style="background: #2f855a;">Excel読込</button>
   <button onclick="window.print()" style="background: #1a202c;">印刷</button>
 </div>
