@@ -10,101 +10,53 @@
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
+body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif; margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5; line-height: 1.6; }
+.wrap { max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+@media (max-width: 800px) { .wrap { max-width: 100%; padding: 10px; } }
 
-body {
-  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-  margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5;
-}
-
-.wrap { 
-  max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh;
-  padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
-}
-
-@media (max-width: 800px) { 
-  .wrap { max-width: 100%; padding: 15px; } 
-}
-
-.banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
 .banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
 
-/* ボタン配置エリア */
-.controls { 
-  margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-  border-bottom: 2px solid #eee; padding-bottom: 20px;
-}
-
-button { 
-  padding: 10px 15px; background: var(--accent); color: #fff; border: none; 
-  border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
-}
-
-@media (max-width: 600px) {
-  button { width: 48%; margin-bottom: 5px; }
-}
+/* 操作ボタン */
+.controls { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.9); padding: 10px 0; border-bottom: 2px solid #eee; }
+button { padding: 12px 8px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 140px; font-size: 14px; min-width: 120px; }
+button:active { opacity: 0.7; }
 
 /* スマホ用保存案内 */
-.save-guide { 
-  display: none; background: #fff5f5; border: 2px solid #e53e3e; 
-  padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center;
-}
+.save-guide { display: none; background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; font-weight: bold; color: #c53030; }
 
-/* 目次エリア */
-nav.toc {
-  border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa;
-  max-height: 400px; overflow-y: auto; margin-bottom: 16px;
-}
+/* 目次・本文 */
+nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 350px; overflow-y: auto; margin-bottom: 20px; }
 nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
-nav.toc ul ul { display: none; padding-left: 20px; border-top: 1px dashed #ddd; margin-top: 5px; }
+nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
+nav.toc ul ul { display: none; padding-left: 15px; }
 nav.toc li.active > ul { display: block; }
-nav.toc li > a { 
-  cursor: pointer; text-decoration: none; color: var(--accent); display: block; 
-  padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; 
-}
 
-/* 本文エリア */
-.content {
-  border: 2px solid #e2e8f0; padding: 0 15px; border-radius: 8px; background: #fff;
-  height: 600px; overflow-y: scroll; -webkit-overflow-scrolling: touch; margin-top: 10px;
-}
-
-.chapter-title { 
-  font-size: 20px; font-weight: bold; margin: 25px 0 10px; border-left: 6px solid var(--accent);
-  padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5;
-}
-
+.content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; height: 550px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+.chapter-title { font-size: 18px; font-weight: bold; margin: 20px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 
-textarea { 
-  width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; 
-  border-radius: 4px; padding: 8px; font-size: 16px; 
-}
+.desc { display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; }
+.desc-toggle { color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; margin: 5px 0; display: inline-block; }
 
-.desc { 
-  display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; 
-  border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; 
-}
-.desc-toggle { 
-  color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; 
-  margin-top: 5px; display: inline-block; 
-}
+textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; font-family: inherit; }
 
-/* フッター */
-.footer-info { margin-top: 40px; padding: 20px 0; text-align: left; border-top: 1px solid #eee; }
-.info-text-bold { font-size: 18px; font-weight: bold; line-height: 1.6; display: block; margin-bottom: 20px; }
+.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 15px; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <div class="banner-container">
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" alt="メインビジュアル">
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg">
   </div>
 
   <div style="text-align: center;">
-    <p><font size="4" color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
-    <h2 style="font-size: 26px; margin: 10px 0;">マイライフチェック</h2>
+    <h2 style="margin: 10px 0;">マイライフチェック</h2>
+  </div>
+
+  <div id="saveGuide" class="save-guide">
+    【スマホの方】次の画面で「"ファイル"に保存」を選んでください
   </div>
 
   <div class="controls">
@@ -113,30 +65,17 @@ textarea {
     <button onclick="exportExcel()" style="background: #2f855a;">Excel出力</button>
     <button onclick="importExcel()" style="background: #2f855a;">Excel読込</button>
     <button onclick="toggleFilter()" style="background: #555;">未完了のみ切替</button>
-    <button onclick="window.print()" style="background: #1a202c;">印刷</button>
-  </div>
-
-  <div id="saveGuide" class="save-guide">
-    <b>【保存方法】</b> 次の画面で<b>「"ファイル"に保存」</b>を選んでください。
   </div>
 
   <div class="main">
-    <nav class="toc">
-      <ul id="tocList"></ul>
-    </nav>
+    <nav class="toc"><ul id="tocList"></ul></nav>
     <div class="content" id="contentArea"></div>
   </div>
 
   <div class="footer-info">
-    <span class="info-text-bold">
-      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。
-    </span>
-    <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="max-width: 100%;"></p>
-    <div style="text-align: center; margin-top: 20px;">
-      <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none; font-size: 20px; color: blue; font-weight: bold; border-bottom: 1px solid blue;">
-        https://life-supporter.jp/lp/HRSuykFf
-      </a>
-    </div>
+    <p><b>終活・ライフプランのご案内</b></p>
+    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。スマホのIDやパスワードを安全に管理しましょう。</p>
+    <a href="https://life-supporter.jp/lp/HRSuykFf" target="_blank">詳細はこちら（体験版サイト）</a>
   </div>
 
   <input type="file" id="jsonFile" style="display:none" accept=".json">
@@ -144,15 +83,7 @@ textarea {
 </div>
 
 <script>
-// --- 解説データ ---
-const DESC = {
-  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。通帳の場所やネット銀行の有無を明確にしましょう。",
-  "ch1-1": "預金通帳やカードがどこにあるか家族が把握できるように整理しましょう。",
-  "ch6-0": "スマホのロック解除情報は重要です。デジタル遺品トラブルを避けるために準備しましょう。",
-  // 他の項目も必要に応じて追加可能
-};
-
-// --- 章データ ---
+// --- データ定義 ---
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる","借金・ローンの残高や保証人を明記する","公共料金やサブスクの自動引き落としを整理する","財産目録を作成する","相続税の試算をしておく","遺産分割の希望を整理しておく"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護が必要になった時の希望を記録する","介護施設の候補リストを作る","介護保険サービスの利用方法を理解しておく","見守りサービスや生活支援サービスを登録する","日常の家事・買い物支援を手配しておく","緊急連絡網のリストを作る","身元保証人を確保しておく","介護費用の試算をしておく","介護してくれる人への感謝の手紙を書く","将来の住まいについて決めておく"]},
@@ -162,26 +93,36 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの死後対応","クラウド写真","キャッシュレス決済","仮想通貨・NFT","隠したいデータ","デジタル連絡先"]}
 ];
 
+const DESC = {
+  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。",
+  "ch6-0": "スマホのパスコードが不明だと、家族が解約や写真の取り出しができず困るケースが増えています。"
+};
+
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-final-storage";
+const STORAGE_KEY = "life-check-storage-final";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// --- 保存・共有処理 ---
+// --- 保存機能 (JSON) ---
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const fileName = "life-check.json";
 
+  // スマホかつ共有機能が使える場合
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     try {
       const file = new File([blob], fileName, { type: "application/json" });
       document.getElementById('saveGuide').style.display = 'block';
-      await navigator.share({ files: [file], title: 'My Life Check JSON' });
-    } catch (e) {}
-    setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
+      await navigator.share({ files: [file], title: 'ライフチェック保存データ' });
+    } catch (e) {
+      console.log("Share API error or cancelled");
+    } finally {
+      setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
+    }
   } else {
+    // PCの場合：直接ダウンロード
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = fileName;
@@ -191,6 +132,7 @@ async function downloadBackup() {
   }
 }
 
+// --- 保存機能 (Excel) ---
 async function exportExcel() {
   const data = [];
   chapters.forEach(ch => {
@@ -199,6 +141,7 @@ async function exportExcel() {
       data.push({ "章": ch.title, "項目": it, "完了": state[key]?.checked ? "〇" : "", "メモ": state[key]?.memo || "" });
     });
   });
+
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "CheckList");
@@ -209,9 +152,12 @@ async function exportExcel() {
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     try {
       const file = new File([blob], fileName, { type: blob.type });
-      await navigator.share({ files: [file], title: 'My Life Check Excel' });
-    } catch (e) {}
+      await navigator.share({ files: [file], title: 'ライフチェックExcel' });
+    } catch (e) {
+      console.log("Excel share error");
+    }
   } else {
+    // PC用
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = fileName;
@@ -220,7 +166,7 @@ async function exportExcel() {
   }
 }
 
-// --- 読込処理 ---
+// --- 読込機能 ---
 function loadJSON(){ document.getElementById("jsonFile").click(); }
 document.getElementById("jsonFile").onchange = (e) => {
   const file = e.target.files[0];
@@ -229,8 +175,8 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.onload = () => {
     try {
       state = JSON.parse(reader.result);
-      save(); render(); buildTOC(); alert("読み込みました。");
-    } catch(err) { alert("無効なファイルです。"); }
+      saveToLocal(); render(); buildTOC(); alert("読み込みました。");
+    } catch(err) { alert("正しいファイルではありません。"); }
   };
   reader.readAsText(file);
 };
@@ -251,22 +197,22 @@ document.getElementById("excelFile").onchange = (e) => {
           });
         });
       });
-      save(); render(); buildTOC(); alert("Excelから読み込みました。");
-    } catch(err) { alert("Excel読込に失敗しました。"); }
+      saveToLocal(); render(); buildTOC(); alert("Excelから復元しました。");
+    } catch(e) { alert("Excel読込に失敗しました。"); }
   };
   reader.readAsBinaryString(file);
-}
+};
 
-// --- メイン描画処理 ---
+// --- 画面描画 ---
 function render(){
   const c = document.getElementById("contentArea");
+  const scrollTop = c.scrollTop; // スクロール位置保持
   c.innerHTML = "";
   chapters.forEach(ch => {
     const title = document.createElement("div");
     title.className = "chapter-title";
     title.textContent = ch.title;
     c.appendChild(title);
-    
     ch.items.forEach((it, i) => {
       const key = idFor(ch.id, i);
       if(!state[key]) state[key] = {};
@@ -276,15 +222,14 @@ function render(){
       div.className = "item" + (state[key].checked?" checked":"");
       div.innerHTML = `
         <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
-        <div class="desc-toggle">▼ 解説を読む</div>
+        <div class="desc-toggle">▼ 解説を見る</div>
         <div class="desc">${DESC[key] || "（解説準備中...）"}</div>
-        <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
+        <textarea placeholder="ここにメモを入力...">${state[key].memo || ""}</textarea>
       `;
-      
       const cb = div.querySelector("input");
       const ta = div.querySelector("textarea");
-      cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
-      ta.oninput = () => { state[key].memo = ta.value; save(); buildTOC(); };
+      cb.onchange = () => { state[key].checked = cb.checked; saveToLocal(); render(); buildTOC(); };
+      ta.oninput = () => { state[key].memo = ta.value; saveToLocal(); buildTOC(); };
       div.querySelector(".desc-toggle").onclick = () => {
         const d = div.querySelector(".desc");
         d.style.display = (d.style.display === "block") ? "none" : "block";
@@ -292,6 +237,7 @@ function render(){
       c.appendChild(div);
     });
   });
+  c.scrollTop = scrollTop;
 }
 
 function buildTOC(){
@@ -299,17 +245,12 @@ function buildTOC(){
   toc.innerHTML = "";
   chapters.forEach(ch => {
     const li = document.createElement("li");
-    let done = 0;
-    ch.items.forEach((it, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
-    const percent = Math.round(done / ch.items.length * 100);
-    
     const a = document.createElement("a");
-    a.innerHTML = `${ch.title} <span style="color:red">●</span> ${percent}%`;
+    a.textContent = ch.title;
     a.onclick = () => li.classList.toggle("active");
     li.appendChild(a);
-    
     const sub = document.createElement("ul");
-    ch.items.forEach((it, i) => {
+    ch.items.forEach(it => {
       const sli = document.createElement("li");
       sli.innerHTML = `<span style="font-size:14px; color:#666;">- ${it}</span>`;
       sub.appendChild(sli);
@@ -319,10 +260,10 @@ function buildTOC(){
   });
 }
 
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function saveToLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
-// 初期化
+// 初期起動
 state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 render(); buildTOC();
 </script>
