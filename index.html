@@ -4,103 +4,90 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>終活チェックリスト</title>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
   :root { --accent:#2b6cb0; }
-  * { box-sizing: border-box; }
-  body { font-family: "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5; }
-  .wrap { max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh; padding: 20px; }
-  .content { border: 2px solid #e2e8f0; padding: 15px; border-radius: 8px; height: 500px; overflow-y: scroll; margin-bottom: 20px; }
-  .item { padding: 15px 0; border-bottom: 1px solid #eee; }
-  textarea { width: 100%; min-height: 80px; margin-top: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
-  .btn-save { background: #e53e3e; color: white; padding: 20px; width: 100%; border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
+  body { font-family: "Hiragino Kaku Gothic ProN", sans-serif; padding: 20px; background: #f0f2f5; }
+  .wrap { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  .item { border-bottom: 1px solid #eee; padding: 15px 0; }
+  textarea { width: 100%; height: 80px; margin-top: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+  .btn-save { background: #e53e3e; color: white; padding: 20px; width: 100%; border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; margin: 10px 0; }
   .btn-load { background: #718096; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 10px; font-size: 16px; cursor: pointer; }
-  .guide-box { background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 20px 0; display: none; text-align: center; }
+  .confirm-area { display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 20px; border-radius: 10px; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <h2 style="text-align: center;">マイライフチェック</h2>
+  <h2 style="text-align:center;">マイライフチェック</h2>
 
-  <div class="content" id="contentArea">
+  <div id="mainContent">
+    <div class="item">
+      <input type="checkbox" id="c1"> <b>銀行口座の整理</b><br>
+      <textarea id="m1" placeholder="メモを入力"></textarea>
     </div>
-
-  <div id="guide" class="guide-box">
-    <p style="font-weight: bold; color: #e53e3e; margin: 0 0 10px 0;">【重要】この後、画面の下から<br>「メニュー」が出てきます。</p>
-    <p style="font-size: 15px; margin: 0;">リストにある<b>「"ファイル"に保存」</b>を<br>選んで、右上の「保存」を押してください。</p>
   </div>
 
-  <button class="btn-save" onclick="shareData()">今の内容を保存する</button>
-  
-  <button class="btn-load" onclick="document.getElementById('jsonFile').click()">保存したデータを開く</button>
-  <input type="file" id="jsonFile" style="display:none" onchange="loadJSON(event)">
+  <div id="confirmArea" class="confirm-area">
+    <p>ファイル名：<br><b style="font-size:22px;">life-check.json</b></p>
+    <p style="font-size:14px; color:#666;">※保存するたびに末尾に (1) (2) と数字がつきますが、そのまま確定して大丈夫です。</p>
+    <button class="btn-save" onclick="doDownload()">この名前で保存を確定</button>
+    <button onclick="cancel()" style="background:none; border:none; color:blue; text-decoration:underline;">戻る</button>
+  </div>
 
-  <div style="margin-top:20px; font-size:14px; background:#eef; padding:15px; border-radius:8px;">
-    ※「保存」ボタンを押しても何も起きない場合は、もう一度ゆっくり押してみてください。
+  <button id="saveStartBtn" class="btn-save" onclick="showConfirm()">今の内容を保存する</button>
+  <button id="loadBtn" class="btn-load" onclick="document.getElementById('fInput').click()">保存したデータを開く</button>
+  
+  <input type="file" id="fInput" style="display:none" onchange="loadData(event)">
+  
+  <div style="margin-top:20px; font-size:14px; color:#555; background:#eef; padding:15px; border-radius:8px;">
+    <b>【探し方のコツ】</b><br>
+    「データを開く」を押したあと、一番上にある<b>「最新のファイル（数字が大きいもの）」</b>を選んでください。
   </div>
 </div>
 
 <script>
-const items = ["銀行口座の整理", "通帳・カード整理", "年金手続き", "保険の整理", "資産情報", "借金・ローン", "公共料金", "財産目録"];
-let state = JSON.parse(localStorage.getItem("life-check-v2") || "{}");
+let state = JSON.parse(localStorage.getItem("shukatsu-v3") || "{}");
 
-function render(){
-  const c = document.getElementById("contentArea");
-  c.innerHTML = "";
-  items.forEach((it, i) => {
-    const key = "item-" + i;
-    if(!state[key]) state[key] = {checked:false, memo:""};
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `<input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b><br><textarea>${state[key].memo || ""}</textarea>`;
-    div.querySelector("input").onchange = (e) => { state[key].checked = e.target.checked; saveLocal(); };
-    div.querySelector("textarea").onblur = (e) => { state[key].memo = e.target.value; saveLocal(); };
-    c.appendChild(div);
-  });
+function showConfirm() {
+  document.getElementById('confirmArea').style.display = 'block';
+  document.getElementById('saveStartBtn').style.display = 'none';
+  document.getElementById('loadBtn').style.display = 'none';
 }
 
-function saveLocal(){ localStorage.setItem("life-check-v2", JSON.stringify(state)); }
-
-// iPhoneで最も確実な「共有」機能を使った保存
-async function shareData() {
-  const dataStr = JSON.stringify(state, null, 2);
-  const file = new File([dataStr], "life-check.json", {type: "application/json"});
-
-  // 案内を表示
-  document.getElementById('guide').style.display = 'block';
-
-  try {
-    // iPhone標準の共有メニューを呼び出す
-    if (navigator.share) {
-      await navigator.share({
-        files: [file],
-        title: '終活データ',
-        text: 'マイライフチェックの保存データです'
-      });
-    } else {
-      alert("このブラウザでは共有機能が使えません。Safariでお試しください。");
-    }
-  } catch (err) {
-    console.log("共有キャンセルまたはエラー");
-  } finally {
-    setTimeout(() => { document.getElementById('guide').style.display = 'none'; }, 5000);
-  }
+function cancel() {
+  document.getElementById('confirmArea').style.display = 'none';
+  document.getElementById('saveStartBtn').style.display = 'block';
+  document.getElementById('loadBtn').style.display = 'block';
 }
 
-function loadJSON(event){
-  const file = event.target.files[0];
+function doDownload() {
+  state = { c1: document.getElementById('c1').checked, m1: document.getElementById('m1').value };
+  const blob = new Blob([JSON.stringify(state)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "life-check.json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    alert("保存しました。");
+    cancel();
+  }, 500);
+}
+
+function loadData(e) {
+  const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    state = JSON.parse(e.target.result);
-    saveLocal(); render();
+  reader.onload = (ev) => {
+    state = JSON.parse(ev.target.result);
+    document.getElementById('c1').checked = state.c1;
+    document.getElementById('m1').value = state.m1;
     alert("読み込みました。");
   };
   reader.readAsText(file);
 }
-
-render();
 </script>
 </body>
 </html>
