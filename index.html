@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>終活チェックリスト（6ボタン完全版）</title>
+<title>終活チェックリスト（スマホ保存・Excel出力完全版）</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -29,7 +29,7 @@ nav.toc li.active a::after { content: "▲"; }
 nav.toc ul ul { display: none; padding-left: 15px; background: #fff; }
 nav.toc li.active ul { display: block; }
 
-/* 本文エリア */
+/* コンテンツ */
 .content { border: 2px solid #e2e8f0; border-radius: 8px; height: 500px; overflow-y: scroll; padding: 15px; -webkit-overflow-scrolling: touch; }
 .chapter-title { background: #f0f4f8; padding: 10px; font-weight: bold; position: sticky; top: 0; border-left: 6px solid var(--accent); margin: 20px 0 10px; z-index: 10; }
 
@@ -37,7 +37,7 @@ nav.toc li.active ul { display: block; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
 
-/* 6つの操作ボタン */
+/* 操作ボタン（6個） */
 .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 25px 0; padding-top: 15px; border-top: 2px solid #eee; }
 .controls button { flex: 1 1 140px; max-width: 180px; padding: 12px 5px; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
 
@@ -90,7 +90,7 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホロック解除","パスワード保管","ネット銀行","サブスク解約","SNS対応","クラウド写真","電子マネー","暗号資産","非公開データ","ネットの友人"]}
 ];
 
-const STORAGE_KEY = "shukatsu_v10_final";
+const STORAGE_KEY = "shukatsu_final_confirmed";
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 let filterMode = false;
 
@@ -148,28 +148,27 @@ function update(key, prop, val) {
 
 function toggleFilter() { filterMode = !filterMode; render(); }
 
-// --- スマホ保存処理 ---
+// --- 午前中に動作確認済みの保存ロジック（スマホ対応） ---
 function downloadBackup() {
   try {
-    const jsonStr = JSON.stringify(state, null, 2);
-    const blob = new Blob([jsonStr], {type: "application/json"});
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "shukatsu_backup.json";
+    a.download = "shukatsu_data.json";
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }, 200);
-    alert("保存用ファイルを作成しました。");
+    alert("保存が完了しました。");
   } catch (e) {
-    alert("保存に失敗しました。");
+    alert("保存に失敗しました。ChromeやSafariなどの標準ブラウザをご使用ください。");
   }
 }
 
-// --- データ読込 (JSON) ---
 function loadJSON(e) {
   const file = e.target.files[0];
   if(!file) return;
@@ -179,43 +178,38 @@ function loadJSON(e) {
       state = JSON.parse(evt.target.result);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       render(); buildTOC();
-      alert("読み込みました");
-    } catch(err) { alert("形式が違います"); }
+      alert("読込完了");
+    } catch(err) { alert("形式エラー"); }
   };
   reader.readAsText(file);
 }
 
-// --- Excel読込 ---
 function loadExcel(e) {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = (evt) => {
-    try {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, {type:'binary'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(ws);
-      data.forEach(row => {
-        if(row.ID) {
-          state[row.ID] = { checked: row.完了 === "〇", memo: row.メモ || "" };
-        }
-      });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      render(); buildTOC();
-      alert("Excelを読み込みました");
-    } catch(err) { alert("Excelの読み込みに失敗しました"); }
+    const bstr = evt.target.result;
+    const wb = XLSX.read(bstr, {type:'binary'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(ws);
+    data.forEach(row => {
+      if(row.ID) state[row.ID] = { checked: row.完了 === "〇", memo: row.メモ || "" };
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    render(); buildTOC();
+    alert("Excel読込完了");
   };
   reader.readAsBinaryString(file);
 }
 
-// Excel出力
+// --- Excel出力 ---
 function exportExcel() {
   const rows = Object.keys(state).map(k => ({ ID: k, 完了: state[k].checked ? "〇" : "", メモ: state[k].memo }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "List");
-  XLSX.writeFile(wb, "shukatsu_list.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "終活リスト");
+  XLSX.writeFile(wb, "shukatsu_export.xlsx");
 }
 
 render();
