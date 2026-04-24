@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>終活チェックリスト（スマホ保存・読込対応版）</title>
+<title>終活チェックリスト（6ボタン完全版）</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -37,9 +37,9 @@ nav.toc li.active ul { display: block; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
 
-/* ボタンエリア：ご提示の通りに配置 */
+/* 6つの操作ボタン */
 .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 25px 0; padding-top: 15px; border-top: 2px solid #eee; }
-.controls button { flex: 1 1 120px; min-width: 120px; padding: 12px 5px; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+.controls button { flex: 1 1 140px; max-width: 180px; padding: 12px 5px; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
 
 .footer-info { margin-top: 40px; }
 </style>
@@ -62,12 +62,14 @@ textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1
   <div class="controls">
     <button onclick="toggleFilter()" style="background:#555;">未完了のみ</button>
     <button onclick="downloadBackup()" style="background:#2b6cb0;">データ保存</button>
-    <button onclick="document.getElementById('excelInput').click()" style="background:#718096;">Excel・データ読込</button>
+    <button onclick="document.getElementById('jsonInput').click()" style="background:#4a5568;">データ読込</button>
+    <button onclick="document.getElementById('excelInput').click()" style="background:#718096;">Excel読込</button>
     <button onclick="exportExcel()" style="background:#2f855a;">Excel出力</button>
     <button onclick="window.print()" style="background:#1a202c;">印刷</button>
   </div>
 
-  <input type="file" id="excelInput" style="display:none" onchange="handleFile(event)" accept=".json,.xlsx,.xls">
+  <input type="file" id="jsonInput" style="display:none" onchange="loadJSON(event)" accept=".json">
+  <input type="file" id="excelInput" style="display:none" onchange="loadExcel(event)" accept=".xlsx,.xls">
 
   <div class="footer-info">
     <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="width:100%; margin-bottom:20px;">
@@ -88,7 +90,7 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホロック解除","パスワード保管","ネット銀行","サブスク解約","SNS対応","クラウド写真","電子マネー","暗号資産","非公開データ","ネットの友人"]}
 ];
 
-const STORAGE_KEY = "shukatsu_final_stable";
+const STORAGE_KEY = "shukatsu_v10_final";
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 let filterMode = false;
 
@@ -146,35 +148,50 @@ function update(key, prop, val) {
 
 function toggleFilter() { filterMode = !filterMode; render(); }
 
-// --- スマホ保存の超安定化版 ---
+// --- スマホ保存処理 ---
 function downloadBackup() {
   try {
     const jsonStr = JSON.stringify(state, null, 2);
-    // DataURL形式にすることで、スマホブラウザに「ファイル」として認識させやすくする
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonStr);
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', 'shukatsu_backup.json');
-    document.body.appendChild(linkElement);
-    linkElement.click();
-    document.body.removeChild(linkElement);
-    
-    alert("保存用ファイルを作成しました。ダウンロードフォルダを確認してください。");
+    const blob = new Blob([jsonStr], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "shukatsu_backup.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 200);
+    alert("保存用ファイルを作成しました。");
   } catch (e) {
-    alert("保存に失敗しました。ChromeまたはSafariで開いてください。");
+    alert("保存に失敗しました。");
   }
 }
 
-// --- Excel・データ読込 ---
-function handleFile(e) {
+// --- データ読込 (JSON) ---
+function loadJSON(e) {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  const ext = file.name.split('.').pop().toLowerCase();
+  reader.onload = (evt) => {
+    try {
+      state = JSON.parse(evt.target.result);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render(); buildTOC();
+      alert("読み込みました");
+    } catch(err) { alert("形式が違います"); }
+  };
+  reader.readAsText(file);
+}
 
-  if (ext === "xlsx" || ext === "xls") {
-    reader.onload = (evt) => {
+// --- Excel読込 ---
+function loadExcel(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, {type:'binary'});
       const ws = wb.Sheets[wb.SheetNames[0]];
@@ -186,28 +203,19 @@ function handleFile(e) {
       });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       render(); buildTOC();
-      alert("Excelデータを読み込みました");
-    };
-    reader.readAsBinaryString(file);
-  } else {
-    reader.onload = (evt) => {
-      try {
-        state = JSON.parse(evt.target.result);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        render(); buildTOC();
-        alert("データを読み込みました");
-      } catch(err) { alert("正しいデータ形式ではありません"); }
-    };
-    reader.readAsText(file);
-  }
+      alert("Excelを読み込みました");
+    } catch(err) { alert("Excelの読み込みに失敗しました"); }
+  };
+  reader.readAsBinaryString(file);
 }
 
+// Excel出力
 function exportExcel() {
   const rows = Object.keys(state).map(k => ({ ID: k, 完了: state[k].checked ? "〇" : "", メモ: state[k].memo }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "終活リスト");
-  XLSX.writeFile(wb, "shukatsu_data.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "List");
+  XLSX.writeFile(wb, "shukatsu_list.xlsx");
 }
 
 render();
