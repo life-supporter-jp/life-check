@@ -2,51 +2,47 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>終活チェックリスト（完全版）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>終活チェックリスト（保存・読込安定版）</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
-body{ font-family:sans-serif; margin:0; padding:0; background:#f0f2f5; font-size:18px; color:#333; line-height:1.6; }
+body{ font-family:sans-serif; margin:0; padding:0; background:#f0f2f5; font-size:18px; color:#333; }
 
 .wrap{ max-width:800px; margin:0 auto; background:#fff; padding:20px; min-height:100vh; box-shadow:0 0 20px rgba(0,0,0,0.1); }
 @media (max-width: 600px) { .wrap { padding: 10px; } body { font-size: 16px; } }
 
 .banner-container img { max-width:100%; height:auto; border-radius:8px; display:block; margin:0 auto; }
 
-/* レイアウト */
 .main { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 
-/* 目次（章） */
+/* 目次 */
 nav.toc { border: 2px solid var(--accent); border-radius: 8px; padding: 12px; background: #fafafa; }
 nav.toc ul { list-style: none; padding: 0; margin: 0; }
 nav.toc li { border-bottom: 1px solid #eee; }
 nav.toc li a { display: block; padding: 12px; color: var(--accent); font-weight: bold; text-decoration: none; cursor: pointer; position: relative; }
-nav.toc li a::after { content: "▼"; position: absolute; right: 10px; font-size: 12px; }
+nav.toc li a::after { content: "▼"; position: absolute; right: 10px; }
 nav.toc li.active a::after { content: "▲"; }
 nav.toc ul ul { display: none; padding-left: 15px; background: #fff; }
 nav.toc li.active ul { display: block; }
-nav.toc ul ul li a { font-weight: normal; font-size: 14px; border: none; padding: 8px; }
-nav.toc ul ul li a::after { content: ""; }
 
 /* コンテンツエリア */
-.content { border: 2px solid #e2e8f0; border-radius: 8px; height: 550px; overflow-y: scroll; padding: 15px; -webkit-overflow-scrolling: touch; }
+.content { border: 2px solid #e2e8f0; border-radius: 8px; height: 500px; overflow-y: scroll; padding: 15px; -webkit-overflow-scrolling: touch; }
 .chapter-title { background: #f0f4f8; padding: 10px; font-weight: bold; position: sticky; top: 0; border-left: 6px solid var(--accent); margin: 20px 0 10px; z-index: 10; }
 
-/* 各項目 */
+/* 項目 */
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
-.item.has-memo { border-left: 4px solid #f44336; padding-left: 10px; }
-textarea { width: 100%; height: 85px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-.desc { display: none; background: #f9f9f9; padding: 12px; border: 1px dotted #ccc; margin-top: 8px; font-size: 15px; border-radius: 4px; }
-.desc-toggle { color: #0056b3; cursor: pointer; text-decoration: underline; font-size: 14px; margin-top: 5px; display: inline-block; }
+textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+.desc { display: none; background: #f9f9f9; padding: 12px; border: 1px dotted #ccc; margin-top: 8px; font-size: 15px; }
+.desc-toggle { color: #0056b3; cursor: pointer; text-decoration: underline; font-size: 14px; display: inline-block; }
 
-/* ボタンエリア */
-.controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 25px 0; border-top: 2px solid #eee; padding-top: 20px; }
-button { padding: 12px 18px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+/* 操作ボタン */
+.controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 25px 0; padding-top: 15px; border-top: 2px solid #eee; }
+button { flex: 1 1 140px; max-width: 200px; padding: 15px 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
 
 .footer-info { margin-top: 40px; }
 </style>
@@ -58,45 +54,34 @@ button { padding: 12px 18px; background: var(--accent); color: #fff; border: non
     <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" alt="メインビジュアル">
   </div>
 
-  <div style="text-align: center;">
-    <p><font color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
-    <h2 style="font-size: 26px; margin: 10px 0;">マイライフチェック</h2>
-  </div>
-
   <div class="main">
     <nav class="toc">
-      <p style="font-weight:bold; margin:0 0 10px;">【章をタップして項目を確認】</p>
+      <p style="font-weight:bold; margin:0 0 10px;">【目次：章をタップして開く】</p>
       <ul id="tocList"></ul>
     </nav>
-    
     <div class="content" id="contentArea"></div>
   </div>
 
   <div class="controls">
-    <button onclick="toggleFilter()" style="background:#555;">未完了のみ表示</button>
-    <button onclick="downloadBackup()">データ保存</button>
-    <button onclick="document.getElementById('jsonFile').click()" style="background:#718096;">データ読込</button>
+    <button onclick="toggleFilter()" style="background:#555;">未完了のみ切替</button>
+    <button onclick="downloadBackup()" style="background:#2b6cb0;">データ保存(保存)</button>
+    <button onclick="document.getElementById('fileInput').click()" style="background:#718096;">データ読込(読込)</button>
     <button onclick="exportExcel()" style="background:#2f855a;">Excel出力</button>
-    <button onclick="window.print()" style="background:#1a202c;">印刷する</button>
+    <button onclick="window.print()" style="background:#1a202c;">印刷</button>
   </div>
+
+  <input type="file" id="fileInput" style="display:none" onchange="handleFile(event)">
 
   <div class="footer-info">
-    <p><b>今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。</b></p>
-    
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="width:100%; margin:20px 0;">
-    
-    <div style="text-align: center; margin: 20px 0;">
-      <span style="font-size: 22px;"><b>以下より体験版をご確認ください。</b></span><br>
-      <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width:180px; margin-top:15px;">
-      <p><a href="https://life-supporter.jp/lp/HRSuykFf" style="color:blue; font-weight:bold; text-decoration:underline;">https://life-supporter.jp/lp/HRSuykFf</a></p>
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="width:100%; margin-bottom:20px;">
+    <div style="text-align:center;">
+        <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width:150px;">
+        <p><a href="https://life-supporter.jp/lp/HRSuykFf" style="color:blue; font-weight:bold;">体験版サイトはこちら</a></p>
     </div>
   </div>
-
-  <input type="file" id="jsonFile" style="display:none" onchange="loadJSON(event)">
 </div>
 
 <script>
-// --- データ定義（全6章・60項目） ---
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧","通帳・キャッシュカード","年金手続き","保険契約","株式・不動産","借金・ローン","公共料金","財産目録","相続税試算","遺産分割"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡網","身元保証人","介護費用","感謝の手紙","住まいの決定"]},
@@ -106,43 +91,36 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホロック解除","パスワード保管","ネット銀行","サブスク解約","SNS対応","クラウド写真","電子マネー","暗号資産","非公開データ","ネットの友人"]}
 ];
 
-const STORAGE_KEY = "shukatsu_v4_data";
+const STORAGE_KEY = "shukatsu_v5_final";
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 let filterMode = false;
 
-// --- 描画処理 ---
 function render() {
   const container = document.getElementById("contentArea");
-  const scrollPos = container.scrollTop;
+  const pos = container.scrollTop;
   container.innerHTML = "";
-
   chapters.forEach(ch => {
-    const title = document.createElement("div");
-    title.className = "chapter-title";
-    title.textContent = ch.title;
-    container.appendChild(title);
-
+    const t = document.createElement("div");
+    t.className = "chapter-title";
+    t.textContent = ch.title;
+    container.appendChild(t);
     ch.items.forEach((item, i) => {
       const key = `ch${ch.id}-${i}`;
       if (!state[key]) state[key] = { checked: false, memo: "" };
       if (filterMode && state[key].checked) return;
-
       const div = document.createElement("div");
-      div.className = "item" + (state[key].checked ? " checked" : "") + (state[key].memo ? " has-memo" : "");
+      div.className = "item" + (state[key].checked ? " checked" : "");
       div.id = key;
       div.innerHTML = `
-        <label style="display:block; cursor:pointer;">
-          <input type="checkbox" ${state[key].checked ? "checked" : ""} onchange="updateCheck('${key}', this.checked)">
-          <b>${item}</b>
-        </label>
-        <div class="desc-toggle" onclick="toggleDesc('${key}')">▼ 解説を表示</div>
-        <div class="desc" id="desc-${key}">${item}に関する大切な準備と記録を行いましょう。</div>
-        <textarea oninput="updateMemo('${key}', this.value)" placeholder="メモを残す...">${state[key].memo}</textarea>
+        <label style="display:block;"><input type="checkbox" ${state[key].checked?"checked":""} onchange="update('${key}', 'checked', this.checked)"><b> ${item}</b></label>
+        <div class="desc-toggle" onclick="toggleD('${key}')">▼ 解説</div>
+        <div class="desc" id="d-${key}">${item}の準備状況を記録しましょう。</div>
+        <textarea oninput="update('${key}', 'memo', this.value)" placeholder="メモ...">${state[key].memo}</textarea>
       `;
       container.appendChild(div);
     });
   });
-  container.scrollTop = scrollPos;
+  container.scrollTop = pos;
 }
 
 function buildTOC() {
@@ -151,75 +129,78 @@ function buildTOC() {
   chapters.forEach(ch => {
     const li = document.createElement("li");
     const a = document.createElement("a");
-    let done = 0;
-    ch.items.forEach((_, i) => { if(state[`ch${ch.id}-${i}`]?.checked) done++; });
-    const per = Math.round(done / ch.items.length * 100);
-    
-    a.innerHTML = `${ch.title} <span style="float:right;">${per}%</span>`;
-    a.onclick = (e) => { e.preventDefault(); li.classList.toggle("active"); };
+    a.textContent = ch.title;
+    a.onclick = () => li.classList.toggle("active");
     li.appendChild(a);
-
-    const sub = document.createElement("ul");
+    const ul = document.createElement("ul");
     ch.items.forEach((item, i) => {
-      const subLi = document.createElement("li");
-      subLi.innerHTML = `<a onclick="scrollToItem('ch${ch.id}-${i}')">${item}</a>`;
-      sub.appendChild(subLi);
+      const sub = document.createElement("li");
+      sub.innerHTML = `<a onclick="document.getElementById('ch${ch.id}-${i}').scrollIntoView()">${item}</a>`;
+      ul.appendChild(sub);
     });
-    li.appendChild(sub);
+    li.appendChild(ul);
     list.appendChild(li);
   });
 }
 
-// --- アクション ---
-function scrollToItem(id) {
-  const el = document.getElementById(id);
-  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+function update(key, prop, val) { 
+  state[key][prop] = val; 
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if(prop === 'checked') { render(); buildTOC(); }
 }
 
-function updateCheck(key, val) { state[key].checked = val; save(); render(); buildTOC(); }
-function updateMemo(key, val) { state[key].memo = val; save(); }
-function toggleDesc(key) {
-  const d = document.getElementById("desc-" + key);
-  d.style.display = (d.style.display === "block") ? "none" : "block";
+function toggleD(key) {
+  const el = document.getElementById("d-"+key);
+  el.style.display = (el.style.display === "block") ? "none" : "block";
 }
+
 function toggleFilter() { filterMode = !filterMode; render(); }
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-// --- ファイル関連 ---
+// --- スマホ対応保存 ---
 function downloadBackup() {
-  const blob = new Blob([JSON.stringify(state)], {type:"application/json"});
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type: "application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "shukatsu_backup.json";
+  a.download = "my_shukatsu_data.json";
   a.click();
 }
 
-function loadJSON(e) {
+// --- 読込処理 (Excel/JSON対応) ---
+function handleFile(e) {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = (event) => {
-    try {
-      state = JSON.parse(event.target.result);
-      save(); render(); buildTOC();
-      alert("データを読み込みました");
-    } catch(err) { alert("正しいファイルを選択してください"); }
-  };
-  reader.readAsText(file);
+  
+  if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+    reader.onload = (evt) => {
+      const workbook = XLSX.read(evt.target.result, {type: 'binary'});
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      alert("Excelからの読込機能は現在データ形式を調整中です。JSON形式の読込を推奨します。");
+    };
+    reader.readAsBinaryString(file);
+  } else {
+    reader.onload = (evt) => {
+      try {
+        state = JSON.parse(evt.target.result);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        render(); buildTOC();
+        alert("読み込みが完了しました");
+      } catch(err) { alert("正しいファイル形式ではありません"); }
+    };
+    reader.readAsText(file);
+  }
 }
 
 function exportExcel() {
-  const rows = [];
-  for(let key in state) {
-    rows.push({ "項目": key, "完了": state[key].checked ? "〇" : "", "メモ": state[key].memo });
-  }
+  const rows = Object.keys(state).map(k => ({ ID: k, 完了: state[k].checked ? "〇" : "", メモ: state[k].memo }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "終活リスト");
-  XLSX.writeFile(wb, "shukatsu_data.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Data");
+  XLSX.writeFile(wb, "shukatsu_list.xlsx");
 }
 
-// 初期化
 render();
 buildTOC();
 </script>
