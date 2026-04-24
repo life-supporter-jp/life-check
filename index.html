@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>終活チェックリスト（完全版）</title>
+<title>終活チェックリスト（動作改善版）</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -11,309 +11,228 @@
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
+body{ font-family:sans-serif; margin:0; padding:0; background:#f0f2f5; font-size:16px; }
+.wrap{ max-width:800px; margin:0 auto; background:#fff; padding:15px; min-height:100vh; }
+.banner-container img { max-width:100%; height:auto; border-radius:8px; display:block; margin:0 auto; }
 
-body{
-  font-family:"Hiragino Kaku Gothic Pro","Noto Sans JP",sans-serif;
-  margin: 0; padding: 0; font-size:18px; color: #333; background-color: #f0f2f5;
-}
+/* レイアウト */
+.main { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+nav.toc { border: 2px solid var(--accent); border-radius: 8px; padding: 10px; background: #fafafa; }
+nav.toc ul { list-style: none; padding: 0; margin: 0; }
+nav.toc li { border-bottom: 1px solid #eee; }
+nav.toc li a { display: block; padding: 12px; color: var(--accent); font-weight: bold; text-decoration: none; cursor: pointer; }
+nav.toc ul ul { display: none; padding-left: 15px; background: #fff; }
+nav.toc li.active ul { display: block; }
 
-.wrap{ 
-  max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh;
-  padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
-}
+.content { border: 2px solid #e2e8f0; border-radius: 8px; height: 500px; overflow-y: scroll; padding: 10px; }
+.chapter-title { background: #f0f4f8; padding: 8px; font-weight: bold; position: sticky; top: 0; border-left: 5px solid var(--accent); margin: 15px 0 10px; }
 
-@media (max-width: 800px) { .wrap { width: 100%; padding: 10px; } body { font-size: 16px; } }
+/* アイテム */
+.item { padding: 15px 5px; border-bottom: 1px solid #eee; }
+.item.checked { background: #e6ffe6; }
+textarea { width: 100%; height: 80px; margin-top: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.desc { display: none; background: #f9f9f9; padding: 10px; border: 1px dotted #ccc; margin-top: 5px; font-size: 14px; }
+.desc-toggle { color: blue; cursor: pointer; text-decoration: underline; font-size: 13px; }
 
-.banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
-.banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
+/* ボタン */
+.controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0; }
+button { padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; min-width: 120px; }
 
-.main{ display:flex; flex-direction:column; gap:16px; }
-
-/* 目次エリア */
-nav.toc{
-  border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa;
-  max-height:450px; overflow-y:auto;
-}
-nav.toc ul{ list-style:none; padding-left:0; margin:0; }
-nav.toc ul ul{ display:none; padding-left: 20px; border-top: 1px dashed #ddd; margin-top: 5px; padding-bottom: 10px; }
-nav.toc li.active > ul{ display:block; }
-nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
-
-/* 本文エリア */
-.content{
-  border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; background: #fff;
-  height: 600px; overflow-y: scroll; -webkit-overflow-scrolling: touch; position: relative; margin-top: 10px;
-}
-
-.chapter-title{ 
-  font-size:20px; font-weight:bold; margin:25px 0 10px; border-left: 6px solid var(--accent);
-  padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5;
-}
-
-.item{ padding:15px 0; border-bottom:1px solid #eee; }
-.item.checked{ background:#e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
-.item.has-memo{ background:#fff5f5; border-left: 4px solid #f44336; padding-left: 10px; }
-
-textarea{ width:100%; min-height:80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; box-sizing: border-box; font-size: 16px; }
-
-.desc{ display:none; background:#f9f9f9; padding:12px; margin-top:8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; color: #444; }
-.desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
-
-.controls{ margin:20px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 100px; }
-
-#qrcode-container {
-  display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: white; padding: 20px; border: 2px solid #333; z-index: 1000; text-align: center;
-  box-shadow: 0 0 100px rgba(0,0,0,0.5); border-radius: 10px;
-}
-
-.footer-info { margin-top: 40px; padding: 20px 0; text-align: left; }
-.info-text-bold { font-size: 18px; font-weight: bold; line-height: 1.6; display: block; margin-bottom: 20px; }
+/* ポップアップ */
+#qr-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; }
+.qr-window { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 10px; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <div class="banner-container">
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" alt="メインビジュアル">
-  </div>
-
-  <div style="text-align: center;">
-    <p><font size="4" color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
-    <h2 style="font-size: 26px; margin: 10px 0;">マイライフチェック</h2>
-  </div>
-
-  <div id="qrcode-container">
-    <p><b>データ移行用QRコード</b></p>
-    <div id="qrcode" style="margin:10px auto;"></div>
-    <button onclick="document.getElementById('qrcode-container').style.display='none'">閉じる</button>
-  </div>
-
-  <div class="main">
-    <nav class="toc">
-      <p style="font-size: 13px; color: #888; margin-bottom: 8px;">▼クリックで章を開閉します</p>
-      <ul id="tocList"></ul>
-    </nav>
-    <div class="content" id="contentArea"></div>
-  </div>
-
-  <div class="controls">
-    <button onclick="toggleFilter()" style="background: #555;">未完了のみ</button>
-    <button onclick="downloadBackup()">データ保存</button>
-    <button onclick="loadJSON()" style="background: #718096;">データ読込</button>
-    <button onclick="exportExcel()" style="background: #2f855a;">Excel出力</button>
-    <button onclick="showQR()" style="background: #e53e3e;">QR表示</button>
-    <button onclick="window.print()" style="background: #1a202c;">印刷</button>
-  </div>
-
-  <div class="footer-info">
-    <span class="info-text-bold">
-      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。
-    </span>
-    <p><br></p>
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: auto; max-width: 100%;">
-    <p><br></p>
-    <div style="text-align: center;"><span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span></div>
-    <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;"></p>
-    <div style="text-align: center; margin-bottom: 50px;">
-      <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none;">
-        <span style="font-size: 20px; color: rgb(0, 0, 255); font-weight: bold; border-bottom: 1px solid blue;">https://life-supporter.jp/lp/HRSuykFf</span>
-      </a>
+    <div class="banner-container">
+        <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg">
     </div>
-  </div>
-  <input type="file" id="jsonFile" style="display:none">
+
+    <div class="main">
+        <nav class="toc">
+            <p style="font-weight:bold; margin:0 0 10px;">【目次：章をタップで開く】</p>
+            <ul id="tocList"></ul>
+        </nav>
+        
+        <div class="content" id="contentArea"></div>
+    </div>
+
+    <div class="controls">
+        <button onclick="toggleFilter()" style="background:#555;">未完了のみ切替</button>
+        <button onclick="downloadBackup()">ファイル保存</button>
+        <button onclick="document.getElementById('jsonFile').click()" style="background:#718096;">ファイル読込</button>
+        <button onclick="exportExcel()" style="background:#2f855a;">Excel出力</button>
+        <button onclick="showQR()" style="background:#e53e3e;">QR表示</button>
+        <button onclick="window.print()" style="background:#1a202c;">印刷</button>
+    </div>
+
+    <div id="qr-overlay" onclick="closeQR()">
+        <div class="qr-window" onclick="event.stopPropagation()">
+            <p>スマホ等で読み取ってください</p>
+            <div id="qrcode" style="margin:15px auto; display:inline-block;"></div><br>
+            <button onclick="closeQR()">閉じる</button>
+        </div>
+    </div>
+
+    <input type="file" id="jsonFile" style="display:none" onchange="loadJSON(event)">
+    
+    <div class="footer-info" style="margin-top:30px;">
+        <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="width:100%;">
+    </div>
 </div>
 
 <script>
-// --- 全データ定義 (欠落なし) ---
+// --- データ定義 ---
 const chapters = [
-{ id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる","借金・ローンの残高や保証人を明記する","公共料金やサブスクの自動引き落としを整理する","財産目録を作成する","相続税の試算をしておく","遺産分割の希望を整理しておく"]},
-{ id:2, title:"第2章 介護・生活サポート", items:["介護が必要になった時の希望を記録する","介護施設の候補リストを作る","介護保険サービスの利用方法を理解しておく","見守りサービスや生活支援サービスを登録する","日常の家事・買い物支援を手配しておく","緊急連絡網のリストを作る","身元保証人を確保しておく","介護費用の試算をしておく","介護してくれる人への感謝の手紙を書く","将来の住まいについて決めておく"]},
-{ id:3, title:"第3章 医療・健康管理", items:["かかりつけ医の情報を整理する","持病や服薬の記録を残す","医療保険証をすぐ取り出せる場所に保管する","延命治療に関する意思表示を明記する","臓器提供の意思を示す","入院セットを準備しておく","成年後見制度や家族信託を検討する","緊急医療情報カードを作成する","健康診断の記録を整理する","在宅医療の体制を確認する"]},
-{ id:4, title:"第4章 心・人生の整理", items:["エンディングノートを作成する","家族や友人への感謝の言葉を書く","思い出の写真や日記を整理する","自分史・年表を作成する","大切な物の譲り先を決める","デジタル遺品を整理する","ペットの世話を託す人を決める","宗教や信仰に関する希望を記録する","心の不安を相談できる人を持つ","趣味や活動の後継者を探す"]},
-{ id:5, title:"第5章 葬儀・供養・死後の手続き", items:["葬儀の規模を決める","葬儀社の事前相談をして見積もりを取る","お墓の準備を決める","納骨堂や樹木葬の情報を収集する","戒名・法名の希望を伝える","葬儀での音楽や花を指定する","遺影写真を準備しておく","香典や供物の扱いを明記する","死後の連絡先リストを作る","死亡後の手続きを一覧化しておく"]},
-{ id:6, title:"第6章 デジタル遺産", items:["スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの死後対応","クラウド写真","キャッシュレス決済","仮想通貨・NFT","隠したいデータ","デジタル連絡先"]}
+    { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧","通帳・カード整理","年金手続き","保険契約","株式・不動産","借金・ローン","公共料金","財産目録","相続税試算","遺産分割"]},
+    { id:2, title:"第2章 介護・生活サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡網","身元保証人","介護費用","感謝の手紙","住まいの決定"]}
 ];
 
-const DESC = {
-"ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。...",
-"ch1-1": "預金通帳やキャッシュカードの整理は、実際の手続きのしやすさに直結する重要な作業です。...",
-"ch1-2": "年金の受給手続きは、老後の生活を支える重要な収入源です。...",
-"ch1-3": "保険契約の整理は、確実に保険金を受け取るために重要です。...",
-"ch1-4": "投資信託、不動産などの情報を整理しておきましょう。...",
-"ch1-5": "借金やローンの情報は、相続時にトラブルを防ぐために必要です。...",
-"ch1-6": "公共料金やサブスクの引き落とし先を確認しましょう。...",
-"ch1-7": "財産目録の作成は相続手続きの基本です。...",
-"ch1-8": "相続税の試算を行い、対策を検討しましょう。...",
-"ch1-9": "遺産分割の希望を家族に伝えておきましょう。...",
-"ch2-0": "介護が必要になった場合の希望を明確にします。...",
-"ch2-1": "介護施設の候補をリストアップしましょう。...",
-"ch2-2": "介護保険サービスの仕組みを理解しましょう。...",
-"ch2-3": "見守りサービスの利用を検討しましょう。...",
-"ch2-4": "家事・買い物支援を調べましょう。...",
-"ch2-5": "緊急連絡先を一覧にしましょう。...",
-"ch2-6": "身元保証人を誰にするか検討しましょう。...",
-"ch2-7": "介護にかかる費用を試算しましょう。...",
-"ch2-8": "感謝の気持ちを言葉にしましょう。...",
-"ch2-9": "将来の住まいについて検討しましょう。...",
-"ch3-0": "かかりつけ医を整理しましょう。...",
-"ch3-1": "持病や薬の情報をまとめましょう。...",
-"ch3-2": "保険証の保管場所を明確にしましょう。...",
-"ch3-3": "延命治療の希望を書き残しましょう。...",
-"ch3-4": "臓器提供の意思を表示しましょう。...",
-"ch3-5": "入院セットを事前に用意しましょう。...",
-"ch3-6": "成年後見制度を検討しましょう。...",
-"ch3-7": "緊急医療カードを作りましょう。...",
-"ch3-8": "健康診断結果を保管しましょう。...",
-"ch3-9": "在宅医療の可能性を確認しましょう。...",
-"ch4-0": "エンディングノートを書き始めましょう。...",
-"ch4-1": "家族への感謝の言葉を綴りましょう。...",
-"ch4-2": "思い出の品を整理しましょう。...",
-"ch4-3": "自分の人生を振り返る年表を作りましょう。...",
-"ch4-4": "大切な物の譲り先を決めましょう。...",
-"ch4-5": "SNSやPC内のデータを整理しましょう。...",
-"ch4-6": "ペットのその後を託しましょう。...",
-"ch4-7": "信仰や宗教の希望を伝えましょう。...",
-"ch4-8": "相談できる相手を確保しましょう。...",
-"ch4-9": "趣味の道具や活動の今後を決めましょう。...",
-"ch5-0": "葬儀の形式を決めましょう。...",
-"ch5-1": "葬儀社の目星をつけましょう。...",
-"ch5-2": "お墓の準備を確認しましょう。...",
-"ch5-3": "新しい供養の形も検討しましょう。...",
-"ch5-4": "戒名の希望があれば伝えましょう。...",
-"ch5-5": "葬儀で流したい曲などを決めましょう。...",
-"ch5-6": "遺影に使う写真を選びましょう。...",
-"ch5-7": "香典の受け取り方針を決めましょう。...",
-"ch5-8": "連絡してほしい人のリストを作りましょう。...",
-"ch5-9": "死後の手続きを書き出しましょう。...",
-"ch6-0": "端末のロック解除方法を伝えましょう。...",
-"ch6-1": "重要なIDとパスワードを保管しましょう。...",
-"ch6-2": "ネット上の資産をリスト化しましょう。...",
-"ch6-3": "サブスクの解約方法をまとめましょう。...",
-"ch6-4": "SNSアカウントの扱いを決めましょう。...",
-"ch6-5": "写真データの引き継ぎ方法を決めましょう。...",
-"ch6-6": "電子マネーの残高を確認しましょう。...",
-"ch6-7": "暗号資産の情報を記録しましょう。...",
-"ch6-8": "見られたくないデータの処理をしましょう。...",
-"ch6-9": "ネット上の友人の連絡先をまとめましょう。..."
-};
+const STORAGE_KEY = "shukatsu_v3_data";
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+let filterMode = false;
 
-let state={};
-let filterMode=false;
-const STORAGE_KEY = "shukatsu-final-data";
+// --- 表示機能 ---
+function render() {
+    const container = document.getElementById("contentArea");
+    container.innerHTML = "";
+    chapters.forEach(ch => {
+        const h = document.createElement("div");
+        h.className = "chapter-title";
+        h.textContent = ch.title;
+        container.appendChild(h);
 
-function idFor(chId, i){ return "ch" + chId + "-" + i; }
+        ch.items.forEach((item, i) => {
+            const key = `ch${ch.id}-${i}`;
+            if (!state[key]) state[key] = { checked: false, memo: "" };
+            if (filterMode && state[key].checked) return;
 
-function render(){
-  const c = document.getElementById("contentArea");
-  const currentScroll = c.scrollTop;
-  c.innerHTML = "";
-  chapters.forEach(ch => {
-    const title = document.createElement("div");
-    title.className = "chapter-title";
-    title.textContent = ch.title;
-    c.appendChild(title);
-    
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      if(!state[key]) state[key] = {checked:false, memo:""};
-      if(filterMode && state[key].checked) return;
-      
-      const div = document.createElement("div");
-      div.className = "item" + (state[key].checked?" checked":"") + (state[key].memo?" has-memo":"");
-      div.id = key;
-      div.innerHTML = `
-        <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
-        <div class="desc-toggle" onclick="toggleDesc('${key}')">▼ 解説</div>
-        <div class="desc" id="desc-${key}">${DESC[key] || "解説準備中"}</div>
-        <textarea placeholder="メモを入力..." oninput="updateMemo('${key}', this.value)">${state[key].memo || ""}</textarea>
-      `;
-      div.querySelector('input').onchange = (e) => updateCheck(key, e.target.checked);
-      c.appendChild(div);
+            const div = document.createElement("div");
+            div.className = "item" + (state[key].checked ? " checked" : "");
+            div.id = key;
+            div.innerHTML = `
+                <label style="display:block; cursor:pointer;">
+                    <input type="checkbox" ${state[key].checked ? "checked" : ""} onchange="updateCheck('${key}', this.checked)">
+                    <b>${item}</b>
+                </label>
+                <div class="desc-toggle" onclick="toggleDesc('${key}')">▼ 解説を見る</div>
+                <div class="desc" id="desc-${key}">ここに解説文が入ります。</div>
+                <textarea oninput="updateMemo('${key}', this.value)" placeholder="メモを入力...">${state[key].memo}</textarea>
+            `;
+            container.appendChild(div);
+        });
     });
-  });
-  c.scrollTop = currentScroll;
 }
 
-function toggleDesc(key) {
-  const d = document.getElementById("desc-" + key);
-  d.style.display = (d.style.display === "block") ? "none" : "block";
+function buildTOC() {
+    const list = document.getElementById("tocList");
+    list.innerHTML = "";
+    chapters.forEach(ch => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.textContent = ch.title;
+        a.onclick = () => {
+            li.classList.toggle("active");
+        };
+        li.appendChild(a);
+
+        const sub = document.createElement("ul");
+        ch.items.forEach((item, i) => {
+            const key = `ch${ch.id}-${i}`;
+            const subLi = document.createElement("li");
+            subLi.innerHTML = `<a onclick="document.getElementById('${key}').scrollIntoView({behavior:'smooth'})">${item}</a>`;
+            sub.appendChild(subLi);
+        });
+        li.appendChild(sub);
+        list.appendChild(li);
+    });
 }
 
+// --- 操作機能 ---
 function updateCheck(key, val) {
-  state[key].checked = val;
-  save(); render(); buildTOC();
+    state[key].checked = val;
+    save();
+    render();
 }
 
 function updateMemo(key, val) {
-  state[key].memo = val;
-  save(); 
+    state[key].memo = val;
+    save();
 }
 
-function buildTOC(){
-  const toc = document.getElementById("tocList");
-  toc.innerHTML = "";
-  chapters.forEach(ch => {
-    const li = document.createElement("li");
-    let done = 0;
-    ch.items.forEach((it, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
-    const percent = Math.round(done / ch.items.length * 100);
-    
+function toggleDesc(key) {
+    const d = document.getElementById("desc-" + key);
+    d.style.display = (d.style.display === "block") ? "none" : "block";
+}
+
+function toggleFilter() {
+    filterMode = !filterMode;
+    render();
+}
+
+function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// --- 保存・出力 ---
+function downloadBackup() {
+    const blob = new Blob([JSON.stringify(state)], {type: "application/json"});
     const a = document.createElement("a");
-    a.innerHTML = `${ch.title} (${percent}%)`;
-    a.onclick = (e) => { e.preventDefault(); li.classList.toggle("active"); };
-    li.appendChild(a);
-
-    const sub = document.createElement("ul");
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      const subli = document.createElement("li");
-      subli.innerHTML = `<a href="javascript:void(0)" onclick="document.getElementById('${key}').scrollIntoView({behavior:'smooth'})" style="font-size:14px; font-weight:normal;">${it}</a>`;
-      sub.appendChild(subli);
-    });
-    li.appendChild(sub);
-    toc.appendChild(li);
-  });
+    a.href = URL.createObjectURL(blob);
+    a.download = "shukatsu_data.json";
+    a.click();
 }
 
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-function downloadBackup(){
-  const blob = new Blob([JSON.stringify(state)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "shukatsu_data.json";
-  a.click();
+function loadJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            state = JSON.parse(e.target.result);
+            save();
+            render();
+            buildTOC();
+            alert("データを読み込みました");
+        } catch (err) {
+            alert("ファイルの形式が正しくありません");
+        }
+    };
+    reader.readAsText(file);
 }
 
-function loadJSON(){ document.getElementById("jsonFile").click(); }
-document.getElementById("jsonFile").onchange = (e) => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = () => { state = JSON.parse(reader.result); save(); render(); buildTOC(); };
-  reader.readAsText(file);
-};
-
-function exportExcel(){
-  const data = [];
-  for(let key in state){ data.push({ 項目:key, 完了:state[key].checked?"〇":"", メモ:state[key].memo||"" }); }
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Data");
-  XLSX.writeFile(wb, "shukatsu.xlsx");
+function exportExcel() {
+    const rows = [];
+    for (let key in state) {
+        rows.push({ "項目ID": key, "完了": state[key].checked ? "〇" : "", "メモ": state[key].memo });
+    }
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "終活データ");
+    XLSX.writeFile(wb, "shukatsu_list.xlsx");
 }
 
 function showQR() {
-  document.getElementById("qrcode").innerHTML = "";
-  new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(state), width: 200, height: 200 });
-  document.getElementById("qrcode-container").style.display = "block";
+    document.getElementById("qrcode").innerHTML = "";
+    try {
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify(state),
+            width: 200,
+            height: 200
+        });
+        document.getElementById("qr-overlay").style.display = "block";
+    } catch (e) {
+        alert("QRコード作成に失敗しました。ネット接続を確認してください。");
+    }
 }
 
-function toggleFilter(){ filterMode = !filterMode; render(); }
+function closeQR() {
+    document.getElementById("qr-overlay").style.display = "none";
+}
 
-// 起動処理
-state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+// 初期起動
 render();
 buildTOC();
 </script>
