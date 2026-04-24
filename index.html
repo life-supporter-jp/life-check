@@ -28,6 +28,7 @@ body {
 .banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
 .banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
 
+/* ボタン配置エリア */
 .controls { 
   margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
   border-bottom: 2px solid #eee; padding-bottom: 20px;
@@ -42,12 +43,14 @@ button {
   button { width: 48%; margin-bottom: 5px; }
 }
 
+/* スマホ用保存案内 */
 .save-guide { 
   display: none; background: #fff5f5; border: 2px solid #e53e3e; 
   padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center;
   font-weight: bold; color: #e53e3e;
 }
 
+/* 目次エリア */
 nav.toc {
   border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa;
   max-height: 400px; overflow-y: auto; margin-bottom: 16px;
@@ -60,6 +63,7 @@ nav.toc li > a {
   padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; 
 }
 
+/* 本文エリア */
 .content {
   border: 2px solid #e2e8f0; padding: 0 15px; border-radius: 8px; background: #fff;
   height: 600px; overflow-y: scroll; -webkit-overflow-scrolling: touch; margin-top: 10px;
@@ -87,6 +91,7 @@ textarea {
   margin-top: 5px; display: inline-block; 
 }
 
+/* フッター */
 .footer-info { margin-top: 40px; padding: 20px 0; text-align: left; border-top: 1px solid #eee; }
 .info-text-bold { font-size: 18px; font-weight: bold; line-height: 1.6; display: block; margin-bottom: 20px; }
 </style>
@@ -95,7 +100,7 @@ textarea {
 
 <div class="wrap">
   <div class="banner-container">
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg">
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg" alt="メインビジュアル">
   </div>
 
   <div style="text-align: center;">
@@ -125,7 +130,7 @@ textarea {
 
   <div class="footer-info">
     <span class="info-text-bold">
-      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。
+      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。
     </span>
     <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="max-width: 100%;"></p>
     <div style="text-align: center; margin-top: 20px;">
@@ -140,79 +145,36 @@ textarea {
 </div>
 
 <script>
-// --- 解説全データ (DESC) ---
+// --- 解説データ (DESC) ---
 const DESC = {
-  // 第1章
-  "ch1-0": "銀行名、支店名、口座番号をメモしましょう。ネット銀行は通帳がないため特に重要です。",
-  "ch1-1": "紛失している場合は再発行を。場所を家族に伝えておくか、メモを残しましょう。",
-  "ch1-2": "基礎年金番号や受給している年金の種類をまとめると手続きがスムーズです。",
-  "ch1-3": "証券の保管場所と、どの保険会社からいくら出るのかを整理します。",
-  "ch1-4": "不動産は権利証、株式は証券会社の情報をまとめましょう。",
-  "ch1-5": "マイナスの財産も重要です。借入先と残高を正確に記しましょう。",
-  "ch1-6": "死後に家族が止めなければならない支払いをリストアップします。",
-  "ch1-7": "プラスとマイナスの財産を一覧にすることで相続の全体像が見えます。",
-  "ch1-8": "基礎控除額（3,000万円＋600万円×法定相続人数）を超えるか確認します。",
-  "ch1-9": "遺言書の作成を検討しましょう。法的に有効な形式が推奨されます。",
+  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。通帳の場所やネット銀行の有無を明確にしましょう。",
+  "ch1-1": "預金通帳やキャッシュカードがどこにあるか家族が把握できるように整理しましょう。",
+  "ch1-2": "年金の受給手続きや種類を確認し、家族がスムーズに手続きできるようにします。",
+  "ch1-3": "保険契約の内容と受取人を整理し、もしもの時に請求漏れがないようにします。",
+  "ch1-4": "株式や不動産などの資産情報をまとめ、相続の手続きを円滑にします。",
+  "ch1-5": "負債やローンの情報を明記することは、相続放棄の判断材料としても重要です。",
+  "ch1-6": "公共料金や定期的な引き落としサービスをリスト化し、解約漏れを防ぎます。",
+  "ch1-7": "自分の資産の全体像を把握するために、財産目録を作成しましょう。",
+  "ch1-8": "将来かかる相続税の目安を知り、事前の対策を検討します。",
+  "ch1-9": "誰に何を譲りたいか、自分の希望を整理しておくことがトラブル防止に繋がります。",
+  
+  "ch2-0": "介護が必要になった際、自宅か施設か、どのようなケアを望むか記録します。",
+  "ch2-1": "あらかじめ施設の種類や費用を調べておくと、家族の負担が軽減されます。",
+  "ch2-5": "緊急時に誰に連絡してほしいか、優先順位を含めたリストを作成します。",
+  "ch2-9": "将来的に住み替えるか、リフォームするかなど住まいの構想を立てます。",
 
-  // 第2章
-  "ch2-0": "自宅で最期を迎えたいか、施設を希望するか、本人の意思が最優先です。",
-  "ch2-1": "入居一時金や月額費用、場所の希望を調べておきましょう。",
-  "ch2-2": "要介護認定の有無や、担当のケアマネジャーの連絡先をメモします。",
-  "ch2-3": "配食や見守りなど、公的・民間のサービスをリスト化します。",
-  "ch2-4": "掃除や買い物など、日常的に助けてくれている人の連絡先をまとめます。",
-  "ch2-5": "いざという時、真っ先に誰に連絡すべきか優先順位を決めましょう。",
-  "ch2-6": "施設入居や入院時に必要な身元保証人を誰にお願いするか考えます。",
-  "ch2-7": "介護にはお金がかかります。自分の資産からいくら出せるか計算しましょう。",
-  "ch2-8": "普段言えない感謝を文字にすると、家族の心の支えになります。",
-  "ch2-9": "バリアフリー化するか、住み替えるかなど、老後の住環境を決めます。",
+  "ch3-3": "延命治療を望むかどうかなど、自分の意思を明確に記しておきましょう。",
+  "ch3-5": "急な入院に備えて、保険証や洗面用具などのセットを準備しておくと安心です。",
 
-  // 第3章
-  "ch3-0": "現在の疾患や通院先の電話番号、担当医の名前をまとめます。",
-  "ch3-1": "お薬手帳の場所を明確に。アレルギー情報も重要です。",
-  "ch3-2": "健康保険証、マイナ保険証、介護保険証をまとめて保管しましょう。",
-  "ch3-3": "意識がない時、延命治療を望むかどうか。尊厳死の意思表示を検討します。",
-  "ch3-4": "献体や臓器提供の意思がある場合は、カードなどに記します。",
-  "ch3-5": "パジャマ、タオル、スリッパなど、急な入院でも困らないようまとめます。",
-  "ch3-6": "判断力が衰えた時に備え、誰に財産管理を託すか相談しておきましょう。",
-  "ch3-7": "救急隊員が見てすぐわかる場所に、持病やかかりつけ医を書いたカードを置きます。",
-  "ch3-8": "過去の健診結果を整理しておくと、診察時に役立ちます。",
-  "ch3-9": "最期を自宅で過ごす場合、訪問診療などの協力機関を探しておきます。",
+  "ch4-0": "エンディングノートは、大切な人へ想いを伝える最も身近な手段です。",
+  "ch4-5": "SNSやスマホのデータなど、デジタル上の遺品をどう扱うか決めましょう。",
 
-  // 第4章
-  "ch4-0": "法的な効力はなくとも、想いを伝えるためのノートを書き進めましょう。",
-  "ch4-1": "配偶者、子供、友人に宛てたメッセージを用意します。",
-  "ch4-2": "不要なものは処分し、大切なものは誰に譲るかシールを貼るなどします。",
-  "ch4-3": "自分の歩みを振り返ることで、これからの生き方の整理にもなります。",
-  "ch4-4": "形見分けのリストを作っておくと、死後の争いを防げます。",
-  "ch4-5": "PCやスマホ内のデータ、SNSアカウントの削除・保存を指示します。",
-  "ch4-6": "自分が亡くなった後、ペットを誰に託すか、飼育費用はどうするか決めます。",
-  "ch4-7": "菩提寺や所属する教会の連絡先、宗派を明記しましょう。",
-  "ch4-8": "孤独を感じないよう、地域や知人とのつながりを持ち続けましょう。",
-  "ch4-9": "これまで大切にしてきた活動を引き継いでくれる人を探します。",
+  "ch5-0": "葬儀の形式や規模について、自分の希望を書き留めておきます。",
+  "ch5-6": "遺影に使ってほしいお気に入りの写真を用意しておきましょう。",
 
-  // 第5章
-  "ch5-0": "直葬、家族葬、一般葬など、希望する規模と予算を伝えます。",
-  "ch5-1": "複数の会社を比較し、事前に見積もりを取っておくと安心です。",
-  "ch5-2": "先祖代々の墓か、新しく用意するか。場所と管理料を確認します。",
-  "ch5-3": "散骨、樹木葬、永代供養墓など、現代に合った供養法を検討します。",
-  "ch5-4": "お寺にお願いしたい名前（戒名）の希望があれば記します。",
-  "ch5-5": "流してほしい音楽や、飾ってほしい花の種類をメモしましょう。",
-  "ch5-6": "遺影写真は重要です。自分らしい1枚を事前に用意しましょう。",
-  "ch5-7": "香典を辞退するか、受け取るか。返礼品の希望もあれば書きます。",
-  "ch5-8": "亡くなったことを知らせてほしい人のリストを作っておきます。",
-  "ch5-9": "役所への届け出、社会保険、公共料金の解約手順をまとめます。",
-
-  // 第6章
-  "ch6-0": "これが不明だと遺族は何もできません。信頼できる人に伝える方法を確保します。",
-  "ch6-1": "Google、Apple、LINEなどのアカウント情報を一覧にします。",
-  "ch6-2": "ネット銀行や証券会社のログイン情報は、紙のメモが有効です。",
-  "ch6-3": "動画配信、音楽、新聞などの月額課金をリストアップします。",
-  "ch6-4": "アカウントの削除（追悼アカウント設定）を事前に済ませましょう。",
-  "ch6-5": "家族に見せたい写真、共有したい思い出データの場所を教えます。",
-  "ch6-6": "PayPayなどの残高、ポイントサービスの情報をまとめます。",
-  "ch6-7": "暗号資産（仮想通貨）などは、秘密鍵がないと取り出せなくなります。",
-  "ch6-8": "見られたくないデータや履歴の消去方法を指示しましょう。",
-  "ch6-9": "スマホの中にしかいない知人の連絡先をリスト化します。"
+  "ch6-0": "スマホのパスコードは、デジタル遺品のトラブルで最も多い問題です。安全な伝え方を考えましょう。",
+  "ch6-1": "各種サービスのID・パスワードを一覧にし、信頼できる場所に保管します。",
+  "ch6-3": "有料の定期購入（サブスク）は、死後も引き落としが続くためリスト化が必須です。"
 };
 
 // --- 章データ ---
@@ -227,11 +189,11 @@ const chapters = [
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-master-data";
+const STORAGE_KEY = "life-check-final-unified-storage";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// --- 保存・読込 (JSON/Excel) ---
+// --- 保存・共有処理 (JSON) ---
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
@@ -241,7 +203,7 @@ async function downloadBackup() {
     try {
       const file = new File([blob], fileName, { type: "application/json" });
       document.getElementById('saveGuide').style.display = 'block';
-      await navigator.share({ files: [file], title: 'Life Check Data' });
+      await navigator.share({ files: [file], title: 'ライフチェック保存データ' });
     } catch (e) {}
     setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
   } else {
@@ -254,6 +216,7 @@ async function downloadBackup() {
   }
 }
 
+// --- 保存・共有処理 (Excel) ---
 async function exportExcel() {
   const data = [];
   chapters.forEach(ch => {
@@ -272,7 +235,7 @@ async function exportExcel() {
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     try {
       const file = new File([blob], fileName, { type: blob.type });
-      await navigator.share({ files: [file], title: 'Life Check Excel' });
+      await navigator.share({ files: [file], title: 'ライフチェックExcel出力' });
     } catch (e) {}
   } else {
     const url = URL.createObjectURL(blob);
@@ -283,6 +246,7 @@ async function exportExcel() {
   }
 }
 
+// --- 読込処理 ---
 function loadJSON(){ document.getElementById("jsonFile").click(); }
 document.getElementById("jsonFile").onchange = (e) => {
   const file = e.target.files[0];
@@ -292,7 +256,7 @@ document.getElementById("jsonFile").onchange = (e) => {
     try {
       state = JSON.parse(reader.result);
       saveToLocal(); render(); buildTOC(); alert("読み込みました。");
-    } catch(err) { alert("無効なファイルです。"); }
+    } catch(err) { alert("正しいファイル形式ではありません。"); }
   };
   reader.readAsText(file);
 };
@@ -314,15 +278,15 @@ document.getElementById("excelFile").onchange = (e) => {
         });
       });
       saveToLocal(); render(); buildTOC(); alert("Excelから読み込みました。");
-    } catch(err) { alert("Excel読込失敗。"); }
+    } catch(err) { alert("Excel読込に失敗しました。"); }
   };
   reader.readAsBinaryString(file);
 }
 
-// --- 描画ロジック ---
+// --- 画面描画 ---
 function render(){
   const c = document.getElementById("contentArea");
-  const scroll = c.scrollTop;
+  const currentScroll = c.scrollTop;
   c.innerHTML = "";
   chapters.forEach(ch => {
     const title = document.createElement("div");
@@ -340,7 +304,7 @@ function render(){
       div.innerHTML = `
         <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
         <div class="desc-toggle">▼ 解説を読む</div>
-        <div class="desc">${DESC[key] || "（この項目の具体的なポイントを整理しましょう）"}</div>
+        <div class="desc">${DESC[key] || "（解説準備中...）"}</div>
         <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
       `;
       
@@ -355,7 +319,7 @@ function render(){
       c.appendChild(div);
     });
   });
-  c.scrollTop = scroll;
+  c.scrollTop = currentScroll;
 }
 
 function buildTOC(){
@@ -373,7 +337,7 @@ function buildTOC(){
     li.appendChild(a);
     
     const sub = document.createElement("ul");
-    ch.items.forEach(it => {
+    ch.items.forEach((it, i) => {
       const sli = document.createElement("li");
       sli.innerHTML = `<span style="font-size:14px; color:#666;">- ${it}</span>`;
       sub.appendChild(sli);
