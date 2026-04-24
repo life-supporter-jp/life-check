@@ -5,27 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>マイライフチェック</title>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
 body{ font-family:sans-serif; margin:0; padding:0; font-size:18px; color:#333; background:#f0f2f5; }
-.wrap{ max-width:800px; margin:0 auto; background:#fff; min-height:100vh; padding:20px; }
+.wrap{ max-width:800px; margin:0 auto; background:#fff; min-height:100vh; padding:20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
 @media (max-width:800px) { .wrap { padding:10px; } }
+
 .banner-container img { max-width:100%; height:auto; display:block; margin:0 auto; border-radius:8px; }
+
 .main{ display:flex; flex-direction:column; gap:16px; margin-top:20px; }
 nav.toc{ border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; max-height:400px; overflow-y:auto; }
 nav.toc li > a { cursor:pointer; text-decoration:none; color:var(--accent); display:block; padding:12px 0; font-weight:bold; border-bottom:1px solid #eee; }
 nav.toc ul ul{ display:none; padding-left:20px; }
 nav.toc li.active > ul{ display:block; }
+
 .content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; }
 .chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
+
 .item{ padding:15px 0; border-bottom:1px solid #eee; }
 .item.checked{ background:#e6ffe6; border-left:4px solid #4caf50; padding-left:10px; }
 textarea{ width:100%; min-height:80px; margin-top:10px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:16px; }
+
 .controls{ margin:25px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; border-bottom:2px solid #eee; padding-bottom:20px; }
 button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:14px; min-width:120px; flex:1; }
+
 .footer-info { margin-top:40px; padding:20px 0; }
 .info-text { font-size:18px; font-weight:bold; line-height:1.8; margin-bottom:20px; }
 </style>
@@ -123,7 +129,8 @@ function buildTOC(){
     li.appendChild(a);
     const ul = document.createElement("ul");
     ch.items.forEach((it, i) => {
-      const subli = document.createElement("li"); subli.style.fontSize="14px"; subli.textContent = it;
+      const subli = document.createElement("li"); subli.style.fontSize="14px"; subli.style.padding="5px 0";
+      subli.textContent = it + (state[idFor(ch.id, i)]?.memo ? " (メモあり)" : "");
       ul.appendChild(subli);
     });
     li.appendChild(ul); toc.appendChild(li);
@@ -132,13 +139,14 @@ function buildTOC(){
 
 function save(){ localStorage.setItem("life-check-v100", JSON.stringify(state)); }
 
+// JSON保存：共有メニュー経由
 async function downloadBackup(){
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const f = new File([blob], "life-check.json", {type:"application/json"});
   if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
-    const f = new File([blob], "life-check.json", {type:"application/json"});
     try{ await navigator.share({files:[f]}); }catch(e){}
   } else {
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "life-check.json"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
   }
 }
 
@@ -149,7 +157,9 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.readAsText(e.target.files[0]);
 };
 
+// Excel出力：共有メニュー経由（スマホで確実に保存画面を出す設定）
 async function exportExcel(){
+  if(typeof XLSX === 'undefined') { alert("ライブラリ読込中..."); return; }
   const data = [];
   chapters.forEach(ch => { ch.items.forEach((it, i) => {
     const k = idFor(ch.id, i);
@@ -160,12 +170,16 @@ async function exportExcel(){
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
   const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
   const blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-  
+  const f = new File([blob], "life-check.xlsx", {type:blob.type});
+
   if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
-    const f = new File([blob], "life-check.xlsx", {type:blob.type});
-    try{ await navigator.share({files:[f]}); }catch(e){ alert("共有に失敗しました。"); }
+    try{ await navigator.share({files:[f], title:"エクセル出力"}); }
+    catch(e){ 
+      // 共有が失敗した場合の予備策
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
+    }
   } else {
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "life-check.xlsx"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
   }
 }
 
@@ -178,7 +192,7 @@ document.getElementById("excelFile").onchange = (e) => {
     rows.forEach(r => { chapters.forEach(ch => { ch.items.forEach((it, i) => {
       if(it === r.項目){ state[idFor(ch.id, i)] = {checked: r.状況==="完了", memo: r.メモ||""}; }
     });});});
-    save(); render(); buildTOC();
+    save(); render(); buildTOC(); alert("読み込みました");
   };
   reader.readAsArrayBuffer(e.target.files[0]);
 }
