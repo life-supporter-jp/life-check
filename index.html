@@ -10,60 +10,24 @@
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
-
-body{
-  font-family:"Hiragino Kaku Gothic Pro","Noto Sans JP",sans-serif;
-  margin: 0; padding: 0; font-size:18px; color: #333; background-color: #f0f2f5;
-}
-
-.wrap{ 
-  max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh;
-  padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1);
-}
-
-@media (max-width: 800px) { .wrap { max-width: 100%; padding: 10px; } }
-
-.banner-container { width: 100%; text-align: center; margin-bottom: 20px; }
-.banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
-
-.main{ display:flex; flex-direction:column; gap:16px; }
-
-nav.toc{
-  border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa;
-  max-height:400px; overflow-y:auto;
-}
-nav.toc ul{ list-style:none; padding-left:0; margin:0; }
-nav.toc ul ul{ display:none; padding-left: 20px; border-top: 1px dashed #ddd; margin-top: 5px; padding-bottom: 10px; }
+body{ font-family:sans-serif; margin:0; padding:0; font-size:18px; color:#333; background:#f0f2f5; }
+.wrap{ max-width:800px; margin:0 auto; background:#fff; min-height:100vh; padding:20px; }
+@media (max-width:800px) { .wrap { padding:10px; } }
+.banner-container img { max-width:100%; height:auto; display:block; margin:0 auto; border-radius:8px; }
+.main{ display:flex; flex-direction:column; gap:16px; margin-top:20px; }
+nav.toc{ border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; max-height:400px; overflow-y:auto; }
+nav.toc li > a { cursor:pointer; text-decoration:none; color:var(--accent); display:block; padding:12px 0; font-weight:bold; border-bottom:1px solid #eee; }
+nav.toc ul ul{ display:none; padding-left:20px; }
 nav.toc li.active > ul{ display:block; }
-nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 12px 0; font-weight: bold; border-bottom: 1px solid #eee; }
-
-.content{
-  border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; background: #fff;
-  height: 600px; overflow-y: scroll; -webkit-overflow-scrolling: touch; position: relative; margin-top: 10px;
-}
-
-.chapter-title{ 
-  font-size:20px; font-weight:bold; margin:25px 0 10px; border-left: 6px solid var(--accent);
-  padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5;
-}
-
+.content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; }
+.chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
 .item{ padding:15px 0; border-bottom:1px solid #eee; }
-.item.checked{ background:#e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
-.item.has-memo{ border-left: 4px solid #f44336; }
-
-textarea{ 
-  width:100%; min-height:80px; margin-top: 10px; border: 1px solid #ccc; 
-  border-radius: 4px; padding: 8px; box-sizing: border-box; font-size: 16px; font-family: inherit; 
-}
-
-.desc{ display:none; background:#f9f9f9; padding:12px; margin-top:8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; color: #444; }
-.desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
-
-.controls{ margin:25px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 120px; flex: 1; }
-
-.footer-info { margin-top: 40px; padding: 20px 0; text-align: left; }
-.info-text { font-size: 18px; font-weight: bold; line-height: 1.8; color: #333; }
+.item.checked{ background:#e6ffe6; border-left:4px solid #4caf50; padding-left:10px; }
+textarea{ width:100%; min-height:80px; margin-top:10px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:16px; }
+.controls{ margin:25px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; border-bottom:2px solid #eee; padding-bottom:20px; }
+button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:14px; min-width:120px; flex:1; }
+.footer-info { margin-top:40px; padding:20px 0; }
+.info-text { font-size:18px; font-weight:bold; line-height:1.8; margin-bottom:20px; }
 </style>
 </head>
 <body>
@@ -73,47 +37,35 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
     <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012099.jpg">
   </div>
 
-  <div style="text-align: center;">
+  <div style="text-align:center;">
     <p><font size="4" color="#0000ff">これからの人生をどう彩るかという設計図です</font></p>
-    <h2 style="font-size: 26px; margin: 10px 0;">マイライフチェック</h2>
+    <h2 style="font-size:26px;">マイライフチェック</h2>
   </div>
 
   <div class="main">
-    <nav class="toc">
-      <ul id="tocList"></ul>
-    </nav>
+    <nav class="toc"><ul id="tocList"></ul></nav>
     <div class="content" id="contentArea"></div>
   </div>
 
   <div class="controls">
-    <button onclick="toggleFilter()" style="background: #555;">未完了のみ</button>
+    <button onclick="toggleFilter()" style="background:#555;">未完了のみ</button>
     <button onclick="downloadBackup()">データ保存</button>
-    <button onclick="loadJSON()" style="background: #718096;">データ読込</button>
-    <button onclick="exportExcel()" style="background: #2f855a;">Excel出力</button>
-    <button onclick="importExcel()" style="background: #2f855a;">Excel読込</button>
-    <button onclick="window.print()" style="background: #1a202c;">印刷</button>
+    <button onclick="loadJSON()" style="background:#718096;">データ読込</button>
+    <button onclick="exportExcel()" style="background:#2f855a;">Excel出力</button>
+    <button onclick="importExcel()" style="background:#2f855a;">Excel読込</button>
+    <button onclick="window.print()" style="background:#1a202c;">印刷</button>
   </div>
 
   <div class="footer-info">
     <div class="info-text">
       今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。
     </div>
-    
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: 30px auto; max-width: 100%;">
-    
-    <div style="text-align: center; margin-top: 20px;">
-      <span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span>
-    </div>
-    
-    <p style="text-align: center;">
-      <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;">
-    </p>
-    
-    <div style="text-align: center; margin-bottom: 50px;">
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display:block; margin:20px auto; max-width:100%;">
+    <div style="text-align:center;"><span style="font-size:24px;"><b>以下より体験版をご確認ください。</b></span></div>
+    <p style="text-align:center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width:200px;"></p>
+    <div style="text-align:center; margin-bottom:50px;">
       <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none;">
-        <span style="font-size: 20px; color: blue; font-weight: bold; border-bottom: 1px solid blue;">
-          https://life-supporter.jp/lp/HRSuykFf
-        </span>
+        <span style="font-size:20px; color:blue; font-weight:bold; border-bottom:1px solid blue;">https://life-supporter.jp/lp/HRSuykFf</span>
       </a>
     </div>
   </div>
@@ -123,9 +75,6 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
 </div>
 
 <script>
-// --- 解説データ ---
-const DESC = { "ch1-0": "銀行口座の一覧作成...（略）" };
-
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
@@ -135,174 +84,107 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホ等のロック解除","ID・パスワード保管","ネット銀行・証券","サブスク解約リスト","SNSの死後対応","クラウド写真の整理","キャッシュレス決済","暗号資産・NFT","非公開データの処理","デジタル連絡先"]}
 ];
 
-let state = {};
+let state = JSON.parse(localStorage.getItem("life-check-v100") || "{}");
 let filterMode = false;
-const STORAGE_KEY = "life-checker-final-v100";
 
-function idFor(chId, i){ return "ch" + chId + "-" + i; }
+function idFor(chId, i){ return `ch${chId}-${i}`; }
 
 function render(){
   const c = document.getElementById("contentArea");
-  const scrollTop = c.scrollTop;
+  const scroll = c.scrollTop;
   c.innerHTML = "";
   chapters.forEach(ch => {
-    const title = document.createElement("div");
-    title.className = "chapter-title";
-    title.textContent = ch.title;
-    c.appendChild(title);
-    
+    const t = document.createElement("div"); t.className = "chapter-title"; t.textContent = ch.title;
+    c.appendChild(t);
     ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      if(!state[key]) state[key] = { checked: false, memo: "" };
-      if(filterMode && state[key].checked) return;
-      
-      const div = document.createElement("div");
-      div.className = "item" + (state[key].checked?" checked":"") + (state[key].memo?" has-memo":"");
-      div.id = key;
-      div.innerHTML = `
-        <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
-        <div class="desc-toggle">▼ 解説を見る</div>
-        <div class="desc">${DESC[key] || "解説文を流用してください"}</div>
-        <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
-      `;
-      
-      const cb = div.querySelector("input");
-      const ta = div.querySelector("textarea");
-      cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
-      ta.oninput = () => { state[key].memo = ta.value; save(); };
-      div.querySelector(".desc-toggle").onclick = () => {
-        const d = div.querySelector(".desc");
-        d.style.display = (d.style.display === "block") ? "none" : "block";
-      };
-      c.appendChild(div);
+      const k = idFor(ch.id, i);
+      if(!state[k]) state[k] = { checked:false, memo:"" };
+      if(filterMode && state[k].checked) return;
+      const d = document.createElement("div");
+      d.className = "item" + (state[k].checked?" checked":"");
+      d.innerHTML = `<label><input type="checkbox" ${state[k].checked?"checked":""}> <b>${it}</b></label><textarea placeholder="メモ...">${state[k].memo}</textarea>`;
+      const cb = d.querySelector("input"); const ta = d.querySelector("textarea");
+      cb.onchange = () => { state[k].checked = cb.checked; save(); render(); buildTOC(); };
+      ta.oninput = () => { state[k].memo = ta.value; save(); };
+      c.appendChild(d);
     });
   });
-  c.scrollTop = scrollTop;
+  c.scrollTop = scroll;
 }
 
 function buildTOC(){
-  const toc = document.getElementById("tocList");
-  toc.innerHTML = "";
+  const toc = document.getElementById("tocList"); toc.innerHTML = "";
   chapters.forEach(ch => {
     const li = document.createElement("li");
-    let done = 0;
-    ch.items.forEach((it, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
-    const percent = Math.round(done / ch.items.length * 100);
+    let done = 0; ch.items.forEach((it, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
     const a = document.createElement("a");
-    a.innerHTML = `${ch.title} <span style="color:red">●</span> ${percent}%`;
-    a.onclick = (e) => { e.preventDefault(); li.classList.toggle("active"); };
+    a.innerHTML = `${ch.title} <span style="color:red">●</span> ${Math.round(done/ch.items.length*100)}%`;
+    a.onclick = () => { li.classList.toggle("active"); };
     li.appendChild(a);
-    const sub = document.createElement("ul");
+    const ul = document.createElement("ul");
     ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      const subli = document.createElement("li");
-      const sa = document.createElement("a");
-      sa.style.fontSize = "14px"; sa.style.fontWeight = "normal";
-      sa.innerHTML = it + (state[key]?.memo ? " <b style='color:black'>●</b>" : "");
-      sa.onclick = (e) => {
-        e.preventDefault();
-        const target = document.getElementById(key);
-        if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
-      };
-      subli.appendChild(sa); sub.appendChild(subli);
+      const subli = document.createElement("li"); subli.style.fontSize="14px"; subli.textContent = it;
+      ul.appendChild(subli);
     });
-    li.appendChild(sub); toc.appendChild(li);
+    li.appendChild(ul); toc.appendChild(li);
   });
 }
 
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function save(){ localStorage.setItem("life-check-v100", JSON.stringify(state)); }
 
 async function downloadBackup(){
-  const dataStr = JSON.stringify(state, null, 2);
-  const blob = new Blob([dataStr], {type:"application/json"});
-  const fileName = "life-check.json";
-  
-  if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
-    const file = new File([blob], fileName, {type: "application/json"});
-    try { await navigator.share({ files: [file], title: "保存" }); } 
-    catch(e) { console.log(e); }
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
+    const f = new File([blob], "life-check.json", {type:"application/json"});
+    try{ await navigator.share({files:[f]}); }catch(e){}
   } else {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = fileName;
-    a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "life-check.json"; a.click();
   }
 }
 
 function loadJSON(){ document.getElementById("jsonFile").click(); }
 document.getElementById("jsonFile").onchange = (e) => {
-  const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => { state = JSON.parse(reader.result); save(); render(); buildTOC(); };
-  reader.readAsText(file);
+  reader.readAsText(e.target.files[0]);
 };
 
-// 【重要】Excel出力をスマホでも強制的に発火させるロジック
-function exportExcel(){
-  if (typeof XLSX === 'undefined') {
-    alert("準備中です。数秒待って再度お試しください。");
-    return;
-  }
-  try {
-    const data = [];
-    chapters.forEach(ch => {
-      ch.items.forEach((it, i) => {
-        const key = idFor(ch.id, i);
-        data.push({ "章": ch.title, "項目": it, "状況": state[key]?.checked?"完了":"", "メモ": state[key]?.memo||"" });
-      });
-    });
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "LifeCheck");
-    
-    // スマホでのダウンロードを最も確実に実行する方法
-    const wbout = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
-    function s2ab(s) {
-      const buf = new ArrayBuffer(s.length);
-      const view = new Uint8Array(buf);
-      for (let i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-      return buf;
-    }
-    const blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "life-check.xlsx";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  } catch(err) {
-    alert("エラー: " + err.message);
+async function exportExcel(){
+  const data = [];
+  chapters.forEach(ch => { ch.items.forEach((it, i) => {
+    const k = idFor(ch.id, i);
+    data.push({"章":ch.title, "項目":it, "状況":state[k]?.checked?"完了":"", "メモ":state[k]?.memo||""});
+  });});
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  const blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  
+  if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
+    const f = new File([blob], "life-check.xlsx", {type:blob.type});
+    try{ await navigator.share({files:[f]}); }catch(e){ alert("共有に失敗しました。"); }
+  } else {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "life-check.xlsx"; a.click();
   }
 }
 
 function importExcel(){ document.getElementById("excelFile").click(); }
 document.getElementById("excelFile").onchange = (e) => {
-  const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = (evt) => {
-    const data = new Uint8Array(evt.target.result);
-    const wb = XLSX.read(data, {type:"array"});
+    const wb = XLSX.read(new Uint8Array(evt.target.result), {type:'array'});
     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    rows.forEach(row => {
-      chapters.forEach(ch => {
-        ch.items.forEach((it, i) => {
-          if(it === (row.項目 || row.チェック項目)) {
-            state[idFor(ch.id, i)] = { checked: row.状況 === "完了", memo: row.メモ || "" };
-          }
-        });
-      });
-    });
-    save(); render(); buildTOC(); alert("Excelを読み込みました");
+    rows.forEach(r => { chapters.forEach(ch => { ch.items.forEach((it, i) => {
+      if(it === r.項目){ state[idFor(ch.id, i)] = {checked: r.状況==="完了", memo: r.メモ||""}; }
+    });});});
+    save(); render(); buildTOC();
   };
-  reader.readAsArrayBuffer(file);
+  reader.readAsArrayBuffer(e.target.files[0]);
 }
 
 function toggleFilter(){ filterMode = !filterMode; render(); }
-
-state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-render();
-buildTOC();
+render(); buildTOC();
 </script>
 </body>
 </html>
