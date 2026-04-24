@@ -22,8 +22,11 @@ nav.toc ul { list-style: none; padding: 0; margin: 0; }
 nav.toc li > a { cursor:pointer; text-decoration:none; color:var(--accent); display:block; padding:12px 0; font-weight:bold; border-bottom: 1px solid #eee; }
 nav.toc ul ul{ display:none; padding-left:20px; border-top: 1px dashed #ddd; }
 nav.toc li.active > ul{ display:block; }
+/* 目次の子項目をクリックしやすく */
+nav.toc ul ul li a { display: block; padding: 8px 0; color: #555; font-size: 14px; text-decoration: none; cursor: pointer; }
+nav.toc ul ul li a:hover { text-decoration: underline; color: var(--accent); }
 
-.content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; background: #fff; }
+.content{ border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; height:600px; overflow-y:scroll; -webkit-overflow-scrolling:touch; margin-top:10px; background: #fff; scroll-behavior: smooth; }
 .chapter-title{ font-size:20px; font-weight:bold; margin:25px 0 10px; border-left:6px solid var(--accent); padding:5px 12px; background:#f0f4f8; position:sticky; top:0; z-index:5; }
 
 .item{ padding:20px 0; border-bottom:1px solid #eee; }
@@ -74,7 +77,7 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
     <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display:block; margin:20px auto; max-width:100%;">
     <div style="text-align:center;"><span style="font-size:24px;"><b>以下より体験版をご確認ください。</b></span></div>
     <p style="text-align:center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;"></p>
-    <div style="text-align:center; margin-bottom:50px;">
+    <div style="text-align: center; margin-bottom: 50px;">
       <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none;">
         <span style="font-size: 20px; color:blue; font-weight:bold; border-bottom: 1px solid blue;">https://life-supporter.jp/lp/HRSuykFf</span>
       </a>
@@ -105,7 +108,7 @@ const EXPLANATIONS = {
 let state = JSON.parse(localStorage.getItem("life-check-v100") || "{}");
 let filterMode = false;
 
-function idFor(chId, i){ return "ch" + chId + "-" + i; }
+function idFor(chId, i){ return "item-" + chId + "-" + i; }
 
 // --- 画面描画 ---
 function render(){
@@ -126,6 +129,7 @@ function render(){
       
       const itemDiv = document.createElement("div");
       itemDiv.className = "item" + (state[key].checked ? " checked" : "");
+      itemDiv.id = key; // ジャンプ用のIDを設定
       
       const expText = EXPLANATIONS[key] || "この項目の準備状況を確認し、必要があればメモを残してください。";
       
@@ -135,7 +139,7 @@ function render(){
           <b>${itemText}</b>
         </label>
         <div>
-          <span class="desc-toggle" onclick="event.stopPropagation(); toggleDesc('${key}')">▼ 解説を見る</span>
+          <span class="desc-toggle" onclick="toggleDesc('${key}')">▼ 解説を見る</span>
           <div id="desc-${key}" class="desc-body">${expText}</div>
         </div>
         <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
@@ -143,15 +147,8 @@ function render(){
       
       const cb = itemDiv.querySelector("input");
       const ta = itemDiv.querySelector("textarea");
-      
-      cb.onchange = () => { 
-        state[key].checked = cb.checked; 
-        save(); render(); buildTOC(); 
-      };
-      ta.oninput = () => { 
-        state[key].memo = ta.value; 
-        save(); 
-      };
+      cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
+      ta.oninput = () => { state[key].memo = ta.value; save(); };
       
       container.appendChild(itemDiv);
     });
@@ -162,6 +159,14 @@ function render(){
 function toggleDesc(key){
   const el = document.getElementById("desc-" + key);
   if(el) el.style.display = (el.style.display === "block") ? "none" : "block";
+}
+
+// 目次をクリックした時のジャンプ処理
+function scrollToItem(id) {
+  const target = document.getElementById(id);
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function buildTOC(){
@@ -181,9 +186,14 @@ function buildTOC(){
     const ul = document.createElement("ul");
     ch.items.forEach((itemText, i) => {
       const subli = document.createElement("li");
-      subli.style.fontSize = "14px";
-      subli.style.padding = "5px 0";
-      subli.textContent = itemText + (state[idFor(ch.id, i)]?.memo ? " ✍" : "");
+      const subA = document.createElement("a");
+      const key = idFor(ch.id, i);
+      subA.textContent = itemText + (state[key]?.memo ? " ✍" : "");
+      subA.onclick = (e) => {
+        e.stopPropagation(); // 章の開閉を防ぐ
+        scrollToItem(key);
+      };
+      subli.appendChild(subA);
       ul.appendChild(subli);
     });
     li.appendChild(ul);
@@ -217,7 +227,7 @@ document.getElementById("jsonFile").onchange = (e) => {
 };
 
 async function exportExcel(){
-  if(typeof XLSX === 'undefined') { alert("ライブラリを読み込んでいます。少々お待ちください。"); return; }
+  if(typeof XLSX === 'undefined') { alert("ライブラリ読込中..."); return; }
   const data = [];
   chapters.forEach(ch => { 
     ch.items.forEach((itemText, i) => {
@@ -263,7 +273,6 @@ document.getElementById("excelFile").onchange = (e) => {
 
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
-// 起動
 render();
 buildTOC();
 </script>
