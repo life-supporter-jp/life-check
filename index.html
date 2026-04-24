@@ -10,14 +10,11 @@
   .wrap { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
   h2 { text-align: center; color: var(--accent); }
   .item { border-bottom: 2px solid #eee; padding: 15px 0; }
-  textarea { width: 100%; height: 100px; margin-top: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; }
+  textarea { width: 100%; height: 100px; margin-top: 10px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; }
   
-  /* ボタンをさらに大きく、押しやすく */
-  .btn-save { background: #e53e3e; color: white; padding: 20px; width: 100%; border: none; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 0 #b91c1c; }
-  .btn-save:active { transform: translateY(2px); box-shadow: 0 2px 0 #b91c1c; }
+  .btn-save { background: #e53e3e; color: white; padding: 20px; width: 100%; border: none; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; margin-top: 20px; }
   .btn-load { background: #718096; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 15px; font-size: 16px; cursor: pointer; }
   
-  /* 保存確認エリア */
   .confirm-box { display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
 </style>
 </head>
@@ -28,8 +25,8 @@
 
   <div id="checklist">
     <div class="item">
-      <input type="checkbox" id="check1" style="transform: scale(1.8);"> 
-      <label for="check1" style="font-size: 18px; font-weight: bold; margin-left: 10px;">銀行口座の整理</label>
+      <input type="checkbox" id="check1" style="transform: scale(2.0); margin-right: 15px;"> 
+      <label for="check1" style="font-size: 20px; font-weight: bold;">銀行口座の整理</label>
       <textarea id="memo1" placeholder="メモを入力してください"></textarea>
     </div>
   </div>
@@ -37,12 +34,14 @@
   <button id="startBtn" class="btn-save" onclick="openConfirm()">内容を保存する</button>
 
   <div id="confirmArea" class="confirm-box">
-    <p style="font-weight: bold; font-size: 18px;">【最終確認】</p>
-    <p>名前：<b style="font-size: 22px;">life-check.json</b></p>
+    <p style="font-weight: bold; font-size: 20px; margin-top: 0;">保存の最終確認</p>
+    <p>ファイル名：<b style="font-size: 22px;">life-check.json</b></p>
     
-    <button id="finalBtn" class="btn-save" style="margin-top:0;">この名前で保存を確定</button>
+    <a id="downloadLink" download="life-check.json" class="btn-save" 
+       style="display: block; text-decoration: none; margin-top: 0;" 
+       onclick="prepareData()">この名前で保存を確定</a>
     
-    <button onclick="closeConfirm()" style="background:none; border:none; color:blue; text-decoration:underline; margin-top:15px; display:block; width:100%; font-size: 16px;">戻る</button>
+    <button onclick="closeConfirm()" style="background:none; border:none; color:blue; text-decoration:underline; margin-top:20px; display:block; width:100%; font-size: 18px;">戻る</button>
   </div>
 
   <button id="loadBtn" class="btn-load" onclick="document.getElementById('fileIn').click()">保存したデータを開く</button>
@@ -50,64 +49,57 @@
 </div>
 
 <script>
-let state = JSON.parse(localStorage.getItem("shukatsu-final-v5") || "{}");
+// ローカル保存用
+const SAVE_KEY = "life-check-v6";
+let state = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
 
 function openConfirm() {
-  document.getElementById('confirmArea').style.display = 'block';
-  document.getElementById('startBtn').style.display = 'none';
-  document.getElementById('loadBtn').style.display = 'none';
-  
-  // 「確定ボタン」に直接ダウンロード機能を紐付ける（これが一番確実）
-  document.getElementById('finalBtn').onclick = function() {
-    executeDownload();
-  };
+    // ボタンが押された瞬間に中身を最新にする
+    updateLink();
+    document.getElementById('confirmArea').style.display = 'block';
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('loadBtn').style.display = 'none';
 }
 
 function closeConfirm() {
-  document.getElementById('confirmArea').style.display = 'none';
-  document.getElementById('startBtn').style.display = 'block';
-  document.getElementById('loadBtn').style.display = 'block';
+    document.getElementById('confirmArea').style.display = 'none';
+    document.getElementById('startBtn').style.display = 'block';
+    document.getElementById('loadBtn').style.display = 'block';
 }
 
-function executeDownload() {
-  // データの準備
-  state = {
-    c1: document.getElementById('check1').checked,
-    m1: document.getElementById('memo1').value,
-    ts: new Date().getTime()
-  };
+// データの塊を「確定ボタン」に事前にセットしておく
+function updateLink() {
+    const currentState = {
+        c1: document.getElementById('check1').checked,
+        m1: document.getElementById('memo1').value,
+        time: new Date().getTime()
+    };
+    const blob = new Blob([JSON.stringify(currentState)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const link = document.getElementById('downloadLink');
+    link.href = url;
+}
 
-  const jsonStr = JSON.stringify(state);
-  // iPhoneに「中身を見ずに保存せよ」と命令する形式
-  const blob = new Blob([jsonStr], { type: "application/octet-stream" });
-  const url = URL.createObjectURL(blob);
-  
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "life-check.json";
-  document.body.appendChild(a);
-  a.click();
-  
-  // 実行後、少し待ってから案内を出す
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    alert("「ダウンロードしますか？」と出たら、『ダウンロード』を押してください。\nその後、この画面は元に戻ります。");
-    closeConfirm();
-  }, 300);
+// 保存ボタンが押された瞬間に動く
+function prepareData() {
+    // 画面にメッセージを出す
+    setTimeout(() => {
+        alert("保存の命令を出しました。\n画面の下に『ダウンロード』と出たら、そこをタップしてください。");
+        closeConfirm();
+    }, 500);
 }
 
 function loadData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    state = JSON.parse(ev.target.result);
-    document.getElementById('check1').checked = state.c1;
-    document.getElementById('memo1').value = state.m1;
-    alert("読み込みが完了しました。");
-  };
-  reader.readAsText(file);
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        state = JSON.parse(ev.target.result);
+        document.getElementById('check1').checked = state.c1;
+        document.getElementById('memo1').value = state.m1;
+        alert("読み込みました。");
+    };
+    reader.readAsText(file);
 }
 </script>
 </body>
