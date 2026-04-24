@@ -27,7 +27,12 @@ nav.toc li.active > ul{ display:block; }
 
 .item{ padding:15px 0; border-bottom:1px solid #eee; }
 .item.checked{ background:#e6ffe6; border-left:4px solid #4caf50; padding-left:10px; }
-textarea{ width:100%; min-height:80px; margin-top:10px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:16px; }
+
+/* 解説のデザイン */
+.desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin: 8px 0; display: inline-block; }
+.desc-body{ display:none; background:#f9f9f9; padding:10px; border:1px dotted #ccc; border-radius:4px; font-size:15px; line-height:1.6; margin-bottom:10px; }
+
+textarea{ width:100%; min-height:80px; margin-top:5px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:16px; }
 
 .controls{ margin:25px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; border-bottom:2px solid #eee; padding-bottom:20px; }
 button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:14px; min-width:120px; flex:1; }
@@ -81,6 +86,21 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
 </div>
 
 <script>
+// --- 各項目の解説データ ---
+const EXPLANATIONS = {
+  // 第1章
+  "ch1-0": "どの銀行にいくらあるか、本人以外でも分かるようにしておきましょう。",
+  "ch1-1": "長年使っていない口座は「休眠口座」になる前に整理を検討しましょう。",
+  "ch1-2": "受給している年金の種類や、今後受け取る予定の時期を確認します。",
+  "ch1-3": "保障内容を家族が把握していないと、いざという時に請求が漏れる恐れがあります。",
+  "ch1-4": "不動産の権利証や証券口座のログイン情報は一箇所にまとめましょう。",
+  // 第4章
+  "ch4-0": "自分の歩んできた道や、家族への想いを自由に記すノートです。法的な拘束力はありませんが、家族の大きな支えになります。",
+  "ch4-5": "SNSやサブスクリプション、スマホ自体のパスワード。これらは本人にしか分からないことが多いため、非常に重要です。",
+  // 第6章
+  "ch6-1": "スマホが見られないと緊急連絡先すら分かりません。信頼できる人にのみ、解除方法を伝えておきましょう。"
+};
+
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
@@ -108,7 +128,17 @@ function render(){
       if(filterMode && state[k].checked) return;
       const d = document.createElement("div");
       d.className = "item" + (state[k].checked?" checked":"");
-      d.innerHTML = `<label><input type="checkbox" ${state[k].checked?"checked":""}> <b>${it}</b></label><textarea placeholder="メモ...">${state[k].memo}</textarea>`;
+      
+      const exp = EXPLANATIONS[k] || "この項目について準備を進め、必要に応じてメモを残しましょう。";
+      
+      d.innerHTML = `
+        <label><input type="checkbox" ${state[k].checked?"checked":""}> <b>${it}</b></label>
+        <div>
+          <span class="desc-toggle" onclick="toggleDesc('${k}')">▼ 解説を見る</span>
+          <div id="desc-${k}" class="desc-body">${exp}</div>
+        </div>
+        <textarea placeholder="メモ...">${state[k].memo}</textarea>
+      `;
       const cb = d.querySelector("input"); const ta = d.querySelector("textarea");
       cb.onchange = () => { state[k].checked = cb.checked; save(); render(); buildTOC(); };
       ta.oninput = () => { state[k].memo = ta.value; save(); };
@@ -116,6 +146,11 @@ function render(){
     });
   });
   c.scrollTop = scroll;
+}
+
+function toggleDesc(id){
+  const el = document.getElementById(`desc-${id}`);
+  el.style.display = (el.style.display === 'block') ? 'none' : 'block';
 }
 
 function buildTOC(){
@@ -139,7 +174,6 @@ function buildTOC(){
 
 function save(){ localStorage.setItem("life-check-v100", JSON.stringify(state)); }
 
-// JSON保存：共有メニュー経由
 async function downloadBackup(){
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
   const f = new File([blob], "life-check.json", {type:"application/json"});
@@ -157,9 +191,8 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.readAsText(e.target.files[0]);
 };
 
-// Excel出力：共有メニュー経由（スマホで確実に保存画面を出す設定）
 async function exportExcel(){
-  if(typeof XLSX === 'undefined') { alert("ライブラリ読込中..."); return; }
+  if(typeof XLSX === 'undefined') { alert("準備中..."); return; }
   const data = [];
   chapters.forEach(ch => { ch.items.forEach((it, i) => {
     const k = idFor(ch.id, i);
@@ -173,9 +206,7 @@ async function exportExcel(){
   const f = new File([blob], "life-check.xlsx", {type:blob.type});
 
   if(navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)){
-    try{ await navigator.share({files:[f], title:"エクセル出力"}); }
-    catch(e){ 
-      // 共有が失敗した場合の予備策
+    try{ await navigator.share({files:[f], title:"エクセル出力"}); }catch(e){
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
     }
   } else {
@@ -190,9 +221,11 @@ document.getElementById("excelFile").onchange = (e) => {
     const wb = XLSX.read(new Uint8Array(evt.target.result), {type:'array'});
     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     rows.forEach(r => { chapters.forEach(ch => { ch.items.forEach((it, i) => {
-      if(it === r.項目){ state[idFor(ch.id, i)] = {checked: r.状況==="完了", memo: r.メモ||""}; }
+      if(it === (r.項目 || r.チェック項目)) {
+        state[idFor(ch.id, i)] = {checked: r.状況==="完了", memo: r.メモ||""};
+      }
     });});});
-    save(); render(); buildTOC(); alert("読み込みました");
+    save(); render(); buildTOC(); alert("Excelを読み込みました");
   };
   reader.readAsArrayBuffer(e.target.files[0]);
 }
