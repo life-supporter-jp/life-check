@@ -5,41 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>マイライフチェック</title>
 
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 :root { --accent:#2b6cb0; }
 * { box-sizing: border-box; }
-body { font-family: sans-serif; margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5; }
+body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif; margin: 0; padding: 0; font-size: 18px; color: #333; background-color: #f0f2f5; line-height: 1.6; }
 .wrap { max-width: 800px; margin: 0 auto; background-color: #fff; min-height: 100vh; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
 @media (max-width: 800px) { .wrap { max-width: 100%; padding: 10px; } }
 
 .banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
 
-/* 目次 */
-nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
-nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
-nav.toc ul ul { display: none; padding-left: 20px; border-top: 1px dashed #ddd; }
-nav.toc li.active > ul { display: block; }
-nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
+/* 操作ボタン */
+.controls { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.9); padding: 10px 0; border-bottom: 2px solid #eee; }
+button { padding: 12px 8px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 140px; font-size: 14px; min-width: 120px; }
+button:active { opacity: 0.7; }
 
-/* 本文 */
-.content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; height: 500px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+/* スマホ用保存案内 */
+.save-guide { display: none; background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; font-weight: bold; color: #c53030; }
+
+/* 目次・本文 */
+nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 350px; overflow-y: auto; margin-bottom: 20px; }
+nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
+nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
+nav.toc ul ul { display: none; padding-left: 15px; }
+nav.toc li.active > ul { display: block; }
+
+.content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; height: 550px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
 .chapter-title { font-size: 18px; font-weight: bold; margin: 20px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 
-.desc { display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; }
-.desc-toggle { color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
+.desc { display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; }
+.desc-toggle { color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; margin: 5px 0; display: inline-block; }
 
-textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; }
+textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; font-family: inherit; }
 
-.controls { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-button { padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 140px; }
-
-.save-guide { display: none; background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; }
-
-.footer-info { margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; }
+.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -50,12 +52,11 @@ button { padding: 12px; background: var(--accent); color: #fff; border: none; bo
   </div>
 
   <div style="text-align: center;">
-    <p><font color="blue">これからの人生をどう彩るかという設計図です</font></p>
-    <h2>マイライフチェック</h2>
+    <h2 style="margin: 10px 0;">マイライフチェック</h2>
   </div>
 
   <div id="saveGuide" class="save-guide">
-    <b>【保存方法】</b> 次の画面で<b>「"ファイル"に保存」</b>を選んでください。
+    【スマホの方】次の画面で「"ファイル"に保存」を選んでください
   </div>
 
   <div class="controls">
@@ -72,8 +73,9 @@ button { padding: 12px; background: var(--accent); color: #fff; border: none; bo
   </div>
 
   <div class="footer-info">
-    <p>今回のアプリは如何だったでしょうか？</p>
-    <a href="https://life-supporter.jp/lp/HRSuykFf">体験版はこちら</a>
+    <p><b>終活・ライフプランのご案内</b></p>
+    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。スマホのIDやパスワードを安全に管理しましょう。</p>
+    <a href="https://life-supporter.jp/lp/HRSuykFf" target="_blank">詳細はこちら（体験版サイト）</a>
   </div>
 
   <input type="file" id="jsonFile" style="display:none" accept=".json">
@@ -81,15 +83,7 @@ button { padding: 12px; background: var(--accent); color: #fff; border: none; bo
 </div>
 
 <script>
-// 解説データ
-const DESC = {
-  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。通帳の場所やネット銀行の有無を明確にしましょう。",
-  "ch1-1": "使っていない口座は解約を検討しましょう。残された家族が探す手間を省けます。",
-  "ch6-0": "スマートフォンのパスコードが分からないと、写真や連絡先が永遠に失われる可能性があります。信頼できる人に伝える方法を考えましょう。",
-  // 他の項目も同様に定義（ここでは構造を維持しつつ代表例を記載）
-};
-
-// 章データ
+// --- データ定義 ---
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる","借金・ローンの残高や保証人を明記する","公共料金やサブスクの自動引き落としを整理する","財産目録を作成する","相続税の試算をしておく","遺産分割の希望を整理しておく"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護が必要になった時の希望を記録する","介護施設の候補リストを作る","介護保険サービスの利用方法を理解しておく","見守りサービスや生活支援サービスを登録する","日常の家事・買い物支援を手配しておく","緊急連絡網のリストを作る","身元保証人を確保しておく","介護費用の試算をしておく","介護してくれる人への感謝の手紙を書く","将来の住まいについて決めておく"]},
@@ -99,27 +93,36 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの死後対応","クラウド写真","キャッシュレス決済","仮想通貨・NFT","隠したいデータ","デジタル連絡先"]}
 ];
 
+const DESC = {
+  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。",
+  "ch6-0": "スマホのパスコードが不明だと、家族が解約や写真の取り出しができず困るケースが増えています。"
+};
+
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-storage-v1";
+const STORAGE_KEY = "life-check-storage-final";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// 保存（JSON）
+// --- 保存機能 (JSON) ---
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const fileName = "life-check.json";
 
+  // スマホかつ共有機能が使える場合
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    const file = new File([blob], fileName, { type: "application/json" });
-    document.getElementById('saveGuide').style.display = 'block';
     try {
-      await navigator.share({ files: [file], title: 'Life Check Data' });
-    } catch (err) {}
-    setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
+      const file = new File([blob], fileName, { type: "application/json" });
+      document.getElementById('saveGuide').style.display = 'block';
+      await navigator.share({ files: [file], title: 'ライフチェック保存データ' });
+    } catch (e) {
+      console.log("Share API error or cancelled");
+    } finally {
+      setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
+    }
   } else {
-    // PC用
+    // PCの場合：直接ダウンロード
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = fileName;
@@ -129,7 +132,7 @@ async function downloadBackup() {
   }
 }
 
-// 保存（Excel）
+// --- 保存機能 (Excel) ---
 async function exportExcel() {
   const data = [];
   chapters.forEach(ch => {
@@ -138,6 +141,7 @@ async function exportExcel() {
       data.push({ "章": ch.title, "項目": it, "完了": state[key]?.checked ? "〇" : "", "メモ": state[key]?.memo || "" });
     });
   });
+
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "CheckList");
@@ -146,11 +150,14 @@ async function exportExcel() {
   const fileName = "life-check.xlsx";
 
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    const file = new File([blob], fileName, { type: blob.type });
     try {
-      await navigator.share({ files: [file], title: 'Life Check Excel' });
-    } catch (err) {}
+      const file = new File([blob], fileName, { type: blob.type });
+      await navigator.share({ files: [file], title: 'ライフチェックExcel' });
+    } catch (e) {
+      console.log("Excel share error");
+    }
   } else {
+    // PC用
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = fileName;
@@ -159,7 +166,7 @@ async function exportExcel() {
   }
 }
 
-// 読み込み（JSON）
+// --- 読込機能 ---
 function loadJSON(){ document.getElementById("jsonFile").click(); }
 document.getElementById("jsonFile").onchange = (e) => {
   const file = e.target.files[0];
@@ -168,35 +175,38 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.onload = () => {
     try {
       state = JSON.parse(reader.result);
-      save(); render(); buildTOC(); alert("読み込み成功");
-    } catch(err) { alert("無効なファイルです"); }
+      saveToLocal(); render(); buildTOC(); alert("読み込みました。");
+    } catch(err) { alert("正しいファイルではありません。"); }
   };
   reader.readAsText(file);
 };
 
-// 読み込み（Excel）
 function importExcel(){ document.getElementById("excelFile").click(); }
 document.getElementById("excelFile").onchange = (e) => {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = (evt) => {
-    const wb = XLSX.read(evt.target.result, {type:"binary"});
-    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    json.forEach(row => {
-      chapters.forEach(ch => {
-        ch.items.forEach((it, i) => {
-          if(it === row.項目) state[idFor(ch.id, i)] = { checked: row.完了 === "〇", memo: row.メモ || "" };
+    try {
+      const wb = XLSX.read(evt.target.result, {type:"binary"});
+      const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      data.forEach(row => {
+        chapters.forEach(ch => {
+          ch.items.forEach((it, i) => {
+            if(it === row.項目) state[idFor(ch.id, i)] = { checked: row.完了 === "〇", memo: row.メモ || "" };
+          });
         });
       });
-    });
-    save(); render(); buildTOC(); alert("Excelから復元しました");
+      saveToLocal(); render(); buildTOC(); alert("Excelから復元しました。");
+    } catch(e) { alert("Excel読込に失敗しました。"); }
   };
   reader.readAsBinaryString(file);
 };
 
+// --- 画面描画 ---
 function render(){
   const c = document.getElementById("contentArea");
+  const scrollTop = c.scrollTop; // スクロール位置保持
   c.innerHTML = "";
   chapters.forEach(ch => {
     const title = document.createElement("div");
@@ -212,14 +222,14 @@ function render(){
       div.className = "item" + (state[key].checked?" checked":"");
       div.innerHTML = `
         <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
-        <div class="desc-toggle">▼ 解説</div>
-        <div class="desc">${DESC[key] || "（解説準備中）"}</div>
-        <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
+        <div class="desc-toggle">▼ 解説を見る</div>
+        <div class="desc">${DESC[key] || "（解説準備中...）"}</div>
+        <textarea placeholder="ここにメモを入力...">${state[key].memo || ""}</textarea>
       `;
       const cb = div.querySelector("input");
       const ta = div.querySelector("textarea");
-      cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
-      ta.oninput = () => { state[key].memo = ta.value; save(); buildTOC(); };
+      cb.onchange = () => { state[key].checked = cb.checked; saveToLocal(); render(); buildTOC(); };
+      ta.oninput = () => { state[key].memo = ta.value; saveToLocal(); buildTOC(); };
       div.querySelector(".desc-toggle").onclick = () => {
         const d = div.querySelector(".desc");
         d.style.display = (d.style.display === "block") ? "none" : "block";
@@ -227,6 +237,7 @@ function render(){
       c.appendChild(div);
     });
   });
+  c.scrollTop = scrollTop;
 }
 
 function buildTOC(){
@@ -241,7 +252,7 @@ function buildTOC(){
     const sub = document.createElement("ul");
     ch.items.forEach(it => {
       const sli = document.createElement("li");
-      sli.innerHTML = `<a style="font-size:14px; font-weight:normal;">${it}</a>`;
+      sli.innerHTML = `<span style="font-size:14px; color:#666;">- ${it}</span>`;
       sub.appendChild(sli);
     });
     li.appendChild(sub);
@@ -249,10 +260,10 @@ function buildTOC(){
   });
 }
 
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function saveToLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
-// 初期化
+// 初期起動
 state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 render(); buildTOC();
 </script>
