@@ -16,31 +16,29 @@ body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hirag
 
 .banner-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
 
-/* 操作ボタン：正確に6個並ぶように調整 */
-.controls { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.95); padding: 10px 0; border-bottom: 2px solid #eee; }
+/* 操作ボタン */
+.controls { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); padding: 10px 0; border-bottom: 2px solid #eee; }
 button { padding: 12px 5px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1 1 120px; font-size: 13px; min-width: 110px; }
 button:active { opacity: 0.7; }
 
-/* スマホ用保存案内 */
-.save-guide { display: none; background: #fff5f5; border: 2px solid #e53e3e; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center; font-weight: bold; color: #c53030; }
-
-nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
+/* 目次・本文 */
+nav.toc { border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; max-height: 250px; overflow-y: auto; margin-bottom: 20px; }
 nav.toc ul { list-style: none; padding-left: 0; margin: 0; }
-nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
+nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 8px 0; font-weight: bold; border-bottom: 1px solid #eee; }
 nav.toc ul ul { display: none; padding-left: 15px; }
 nav.toc li.active > ul { display: block; }
 
-.content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; height: 550px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+.content { border: 2px solid #e2e8f0; padding: 10px; border-radius: 8px; background: #fff; height: 500px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
 .chapter-title { font-size: 18px; font-weight: bold; margin: 20px 0 10px; border-left: 6px solid var(--accent); padding: 5px 12px; background: #f0f4f8; position: sticky; top: 0; z-index: 5; }
 .item { padding: 15px 0; border-bottom: 1px solid #eee; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 
-.desc { display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; }
-.desc-toggle { color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; margin: 5px 0; display: inline-block; }
+.desc { display: none; background: #fdfdfd; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 15px; color: #444; line-height: 1.5; }
+.desc-toggle { color: #2b6cb0; cursor: pointer; font-size: 14px; text-decoration: underline; margin: 5px 0; display: inline-block; font-weight: bold; }
 
 textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-size: 16px; font-family: inherit; }
 
-.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 15px; }
+.footer-info { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -54,13 +52,9 @@ textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #c
     <h2 style="margin: 10px 0;">マイライフチェック</h2>
   </div>
 
-  <div id="saveGuide" class="save-guide">
-    【スマホの方】次の画面で「"ファイル"に保存」を選んでください
-  </div>
-
   <div class="controls">
     <button onclick="toggleFilter()" style="background: #555;">未完了のみ</button>
-    <button onclick="downloadBackup()">データ保存</button>
+    <button onclick="downloadBackup()" style="background: #2b6cb0;">データ保存</button>
     <button onclick="loadJSON()" style="background: #718096;">データ読込</button>
     <button onclick="exportExcel()" style="background: #2f855a;">Excel出力</button>
     <button onclick="importExcel()" style="background: #2f855a;">Excel読込</button>
@@ -74,7 +68,7 @@ textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #c
 
   <div class="footer-info">
     <p><b>終活・ライフプランのご案内</b></p>
-    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。</p>
+    <p>大事な記録をサーバーに残せるサイトや、脳トレゲームなどもご案内しています。スマホのIDやパスワードを安全に管理しましょう。</p>
     <a href="https://life-supporter.jp/lp/HRSuykFf" target="_blank">詳細はこちら（体験版サイト）</a>
   </div>
 
@@ -85,48 +79,109 @@ textarea { width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #c
 <script>
 // --- データ定義 ---
 const chapters = [
-  { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧を作成する","預金通帳・キャッシュカードを整理する","年金の受給手続きを確認する","保険契約の内容と受取人を整理する","株式・投資信託・不動産の情報をまとめる","借金・ローン","公共料金","財産目録","相続税試算","遺産分割"]},
-  { id:2, title:"第2章 介護・生活サポート", items:["介護が必要になった時の希望を記録する","介護施設の候補リストを作る","介護保険サービス","見守りサービス","日常の家事支援","緊急連絡網","身元保証人","介護費用の試算","感謝の手紙","将来の住まい"]},
-  { id:3, title:"第3章 医療・健康管理", items:["かかりつけ医","持病や服薬の記録","医療保険証の保管","延命治療の意思表示","臓器提供","入院セット","成年後見制度","緊急医療情報カード","健康診断の記録","在宅医療"]},
-  { id:4, title:"第4章 心・人生の整理", items:["エンディングノート","家族への感謝","思い出の写真整理","自分史作成","大切な物の譲り先","デジタル遺品","ペットの世話","宗教・信仰","相談相手","趣味の後継者"]},
-  { id:5, title:"第5章 葬儀・供養", items:["葬儀の規模","葬儀社の事前相談","お墓の準備","納骨・樹木葬","戒名・法名","音楽や花の指定","遺影写真","香典の扱い","連絡先リスト","死後の手続き"]},
-  { id:6, title:"第6章 デジタル遺産", items:["スマホ・PCのロック解除","ID・パスワードの保管","ネット銀行・証券","サブスクリプション","SNSの対応","クラウド写真","キャッシュレス決済","仮想通貨","隠したいデータ","デジタル連絡先"]}
+  { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
+  { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
+  { id:3, title:"第3章 医療・健康管理", items:["かかりつけ医整理","持病・服薬記録","医療保険証の保管","延命治療の意思表示","臓器提供の意思","入院セット準備","成年後見の検討","緊急医療カード作成","健康診断記録整理","在宅医療体制確認"]},
+  { id:4, title:"第4章 心・人生の整理", items:["エンディングノート","家族への感謝の言葉","写真・日記の整理","自分史・年表作成","大切な物の譲り先","デジタル遺品整理","ペットの世話依頼","宗教・信仰の希望","心の不安相談相手","趣味活動の後継者"]},
+  { id:5, title:"第5章 葬儀・供養", items:["葬儀の規模決定","葬儀社の事前相談","お墓の準備決定","納骨・供養の収集","戒名・法名の希望","音楽・花の指定","遺影写真の準備","香典・供物の扱い","死後の連絡先リスト","死後の手続き一覧"]},
+  { id:6, title:"第6章 デジタル遺産", items:["スマホ等のロック解除","ID・パスワード保管","ネット銀行・証券","サブスク解約リスト","SNSの死後対応","クラウド写真の整理","キャッシュレス決済","暗号資産・NFT","非公開データの処理","デジタル連絡先"]}
 ];
 
 const DESC = {
-  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。",
-  "ch6-0": "スマホのパスコードが不明だと、家族が解約や写真の取り出しができず困るケースが増えています。"
+  "ch1-0": "休眠口座を防ぐため、銀行名・支店名・口座番号を一覧にします。",
+  "ch1-1": "紛失時に備え、保管場所を信頼できる家族に伝えておきます。",
+  "ch1-2": "受給中の年金種類や基礎年金番号をメモしておきましょう。",
+  "ch1-3": "証券番号と連絡先をまとめ、請求漏れを防ぎます。",
+  "ch1-4": "不動産の権利証や固定資産税通知書の場所を確認します。",
+  "ch1-5": "負の遺産も隠さず記録することが家族の負担を減らします。",
+  "ch1-6": "死後に引き落としが続くのを防ぐためのリストです。",
+  "ch1-7": "プラスとマイナスの財産をすべて書き出します。",
+  "ch1-8": "専門家への相談が必要か判断する目安になります。",
+  "ch1-9": "誰に何を継いでほしいか、争族を防ぐための意思表示です。",
+  "ch2-0": "自宅か施設か、どのようなケアを受けたいかを記します。",
+  "ch2-1": "見学や資料請求を行い、希望に合う場所を絞り込みます。",
+  "ch2-2": "要介護認定の申請方法などを事前に調べておきます。",
+  "ch2-3": "自治体や民間が提供する見守りサービスを検討します。",
+  "ch2-4": "シルバー人材センターや配食サービスの利用を考えます。",
+  "ch2-5": "親族、友人、近所の方など、有事の際の連絡順を決めます。",
+  "ch2-6": "独身や親族が遠方の場合、プロの支援サービスも検討します。",
+  "ch2-7": "自己資金でどこまでのケアが可能か算出します。",
+  "ch2-8": "普段言えない感謝を文字にしておくことが心の支えになります。",
+  "ch2-9": "リフォームや住み替えなど、安全な住環境を整えます。",
+  "ch3-0": "現在の診断名や通院先、連絡先をリスト化します。",
+  "ch3-1": "お薬手帳の場所を明確にし、アレルギー情報も記します。",
+  "ch3-2": "急な入院時に家族が迷わず取り出せるようにします。",
+  "ch3-3": "胃ろうや人工呼吸器など、具体的な希望を明記します。",
+  "ch3-4": "免許証やカードの意思表示欄を確認しておきましょう。",
+  "ch3-5": "診察券、印鑑、着替えなど最低限のセットを作ります。",
+  "ch3-6": "判断力が低下した時に備え、信頼できる人を決めます。",
+  "ch3-7": "血液型や緊急連絡先を書いたカードを財布に入れます。",
+  "ch3-8": "過去の病歴を知る手がかりとして保管場所をまとめます。",
+  "ch3-9": "最期を自宅で迎えたい場合、訪問診療の有無を調べます。",
+  "ch4-0": "全ての情報を一冊にまとめる終活のメイン作業です。",
+  "ch4-1": "ビデオメッセージや手紙など、形に残る言葉を準備します。",
+  "ch4-2": "不要なものは処分し、残す写真はベストショットを厳選します。",
+  "ch4-3": "自分の人生を振り返ることで、これからの生き方が見えます。",
+  "ch4-4": "形見分けなど、誰に何を譲るかリスト化します。",
+  "ch4-5": "パソコン内のデータなど、見られたくない物の処分法を決めます。",
+  "ch4-6": "自分が世話できなくなった後の預け先を契約しておきます。",
+  "ch4-7": "葬儀の形式にも関わるため、希望を明確にします。",
+  "ch4-8": "公的機関や専門家、友人の連絡先を整理します。",
+  "ch4-9": "コレクションや活動をどう引き継ぐか指定します。",
+  "ch5-0": "家族のみか、知人を呼ぶか、規模と予算を考えます。",
+  "ch5-1": "信頼できる葬儀社を選び、事前見積もりを取ります。",
+  "ch5-2": "先祖代々の墓か、新設か、墓じまいが必要か確認します。",
+  "ch5-3": "散骨や合祀墓など、新しい形の供養も検討します。",
+  "ch5-4": "特定の宗派や、入れてほしい文字があれば記します。",
+  "ch5-5": "好きな曲や、飾ってほしい花の種類を指定します。",
+  "ch5-6": "自分らしい納得のいく写真を事前に選んでおきます。",
+  "ch5-7": "辞退するか、受け取るかの方針を伝えておきます。",
+  "ch5-8": "死亡時にすぐに知らせてほしい人の電話番号をまとめます。",
+  "ch5-9": "世帯主変更や資格返納など、期限のある手続きをまとめます。",
+  "ch6-0": "スマホのパスコードが不明だと家族が非常に困ります。",
+  "ch6-1": "紙のメモやエンディングノートの秘密欄に記載します。",
+  "ch6-2": "通帳がないネット口座は存在を伝えないと気付かれません。",
+  "ch6-3": "動画配信やアプリ課金など、課金停止が必要なものを列挙します。",
+  "ch6-4": "追悼アカウントへの移行や削除の希望を決めます。",
+  "ch6-5": "思い出が消えないよう、バックアップ先を共有します。",
+  "ch6-6": "PayPay等の残高も遺産になります。IDを控えましょう。",
+  "ch6-7": "ビットコイン等のウォレットキーは厳重に保管します。",
+  "ch6-8": "他人に見られたくないファイルは消去ソフトを検討します。",
+  "ch6-9": "ネット上だけで繋がっている友人への連絡方法を指定します。"
 };
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-v13-final";
+const STORAGE_KEY = "life-check-v2024-stable";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// --- スマホ確認済み保存ロジック (JSON) ---
+// --- 改良版：保存機能 (JSON) ---
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const fileName = "life-check-data.json";
 
+  // スマホ(Share API)が使える場合はそれを使用
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     try {
       const file = new File([blob], fileName, { type: "application/json" });
-      document.getElementById('saveGuide').style.display = 'block';
       await navigator.share({ files: [file], title: 'ライフチェック保存' });
-    } catch (e) { console.log("Share cancelled"); }
-    finally { setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000); }
-  } else {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = fileName;
-    a.click(); URL.revokeObjectURL(url);
+      return; 
+    } catch (e) { console.log("Share API error"); }
   }
+
+  // 失敗した場合やPCの場合はBlobダウンロード
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = fileName;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  alert("データを保存しました。");
 }
 
-// --- スマホ確認済み保存ロジック (Excel) ---
-async function exportExcel() {
+// --- 改良版：保存機能 (Excel) ---
+function exportExcel() {
   const data = [];
   chapters.forEach(ch => {
     ch.items.forEach((it, i) => {
@@ -137,32 +192,17 @@ async function exportExcel() {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "CheckList");
-  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  const fileName = "life-check.xlsx";
-
-  if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    try {
-      const file = new File([blob], fileName, { type: blob.type });
-      await navigator.share({ files: [file], title: 'ライフチェックExcel' });
-    } catch (e) { console.log("Excel share cancelled"); }
-  } else {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = fileName;
-    a.click(); URL.revokeObjectURL(url);
-  }
+  XLSX.writeFile(wb, "life-check.xlsx");
 }
 
-// --- 読込ロジック ---
 function loadJSON(){ document.getElementById("jsonFile").click(); }
 document.getElementById("jsonFile").onchange = (e) => {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    try { state = JSON.parse(reader.result); saveToLocal(); render(); buildTOC(); alert("データを読み込みました"); }
-    catch(err) { alert("正しいファイルではありません"); }
+    try { state = JSON.parse(reader.result); saveToLocal(); render(); buildTOC(); alert("読込完了"); }
+    catch(err) { alert("正しいファイル形式ではありません。"); }
   };
   reader.readAsText(file);
 };
@@ -183,8 +223,8 @@ document.getElementById("excelFile").onchange = (e) => {
           });
         });
       });
-      saveToLocal(); render(); buildTOC(); alert("Excelから復元しました");
-    } catch(e) { alert("Excelの読込に失敗しました"); }
+      saveToLocal(); render(); buildTOC(); alert("Excel読込完了");
+    } catch(e) { alert("読込に失敗しました。"); }
   };
   reader.readAsBinaryString(file);
 };
@@ -202,19 +242,22 @@ function render(){
       const key = idFor(ch.id, i);
       if(!state[key]) state[key] = {};
       if(filterMode && state[key].checked) return;
+      
       const div = document.createElement("div");
       div.className = "item" + (state[key].checked?" checked":"");
       div.innerHTML = `
         <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
         <div class="desc-toggle">▼ 解説を見る</div>
-        <div class="desc">${DESC[key] || "（準備中）"}</div>
-        <textarea placeholder="メモ...">${state[key].memo || ""}</textarea>
+        <div class="desc">${DESC[key] || "（解説準備中...）"}</div>
+        <textarea placeholder="ここにメモを入力...">${state[key].memo || ""}</textarea>
       `;
       div.querySelector("input").onchange = (e) => { state[key].checked = e.target.checked; saveToLocal(); render(); buildTOC(); };
       div.querySelector("textarea").oninput = (e) => { state[key].memo = e.target.value; saveToLocal(); };
-      div.querySelector(".desc-toggle").onclick = () => {
-        const d = div.querySelector(".desc");
-        d.style.display = (d.style.display === "block") ? "none" : "block";
+      div.querySelector(".desc-toggle").onclick = (e) => {
+        const d = e.target.nextElementSibling;
+        const isOpen = d.style.display === "block";
+        d.style.display = isOpen ? "none" : "block";
+        e.target.textContent = isOpen ? "▼ 解説を見る" : "▲ 解説を閉じる";
       };
       c.appendChild(div);
     });
@@ -245,7 +288,7 @@ function buildTOC(){
 function saveToLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
-// 初期化
+// 初期起動
 state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 render(); buildTOC();
 </script>
