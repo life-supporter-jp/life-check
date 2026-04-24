@@ -7,20 +7,18 @@
 <style>
   :root { --accent:#2b6cb0; }
   body { font-family: "Hiragino Kaku Gothic ProN", sans-serif; padding: 20px; background: #f0f2f5; color: #333; }
-  .wrap { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  h2 { text-align: center; color: var(--accent); margin-bottom: 20px; }
-  
+  .wrap { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 15px; }
+  h2 { text-align: center; color: var(--accent); }
   .item { border-bottom: 2px solid #eee; padding: 15px 0; }
   textarea { width: 100%; height: 100px; margin-top: 10px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; }
   
-  /* ボタンのデザイン：さらに大きく、押しやすく */
-  .btn-save { background: #e53e3e; color: white; padding: 22px; width: 100%; border: none; border-radius: 15px; font-size: 24px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 0 #b91c1c; }
-  .btn-save:active { transform: translateY(2px); box-shadow: 0 2px 0 #b91c1c; }
-  .btn-load { background: #718096; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; margin-top: 20px; font-size: 18px; cursor: pointer; }
+  /* ボタン */
+  .btn-save { background: #e53e3e; color: white; padding: 20px; width: 100%; border: none; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+  .btn-load { background: #718096; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 15px; font-size: 16px; cursor: pointer; }
   
-  /* 手順案内エリア */
-  .guide-box { display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 20px; border-radius: 15px; text-align: center; margin-top: 20px; }
-  .step-text { font-size: 18px; font-weight: bold; color: #e53e3e; margin-bottom: 10px; line-height: 1.4; }
+  /* 確実な保存のための「表示エリア」 */
+  .manual-save-box { display: none; background: #fff5f5; border: 3px solid #e53e3e; padding: 15px; border-radius: 12px; margin-top: 20px; }
+  #dataOutput { width: 100%; height: 150px; font-family: monospace; font-size: 12px; margin-top: 10px; background: #eee; border: 1px solid #999; }
 </style>
 </head>
 <body>
@@ -30,73 +28,57 @@
 
   <div id="checklist">
     <div class="item">
-      <input type="checkbox" id="check1" style="transform: scale(2.0); margin-right: 15px;"> 
-      <label for="check1" style="font-size: 20px; font-weight: bold;">銀行口座の整理</label>
-      <textarea id="memo1" placeholder="メモを入力してください"></textarea>
+      <input type="checkbox" id="check1" style="transform: scale(1.8); margin-right: 10px;"> 
+      <label for="check1" style="font-size: 18px; font-weight: bold;">銀行口座の整理</label>
+      <textarea id="memo1" placeholder="メモを入力..."></textarea>
     </div>
   </div>
 
-  <div id="guideArea" class="guide-box">
-    <p class="step-text">【重要】このあと画面の下に<br>メニューが出てきます</p>
-    <p style="font-size: 16px; margin-bottom: 15px;">リストの中から<br><b>「"ファイル"に保存」</b><br>を選んで、右上の保存を押してください。</p>
+  <button id="showSaveBtn" class="btn-save" onclick="showDataForManualSave()">内容を保存する</button>
+
+  <div id="manualSaveArea" class="manual-save-box">
+    <p style="font-weight: bold; margin: 0; color: #e53e3e;">【確実な保存方法】</p>
+    <p style="font-size: 14px; margin: 5px 0;">1. 下の文字を<b>「長押し」して「すべて選択」→「コピー」</b>します。<br>
+    2. iPhoneの<b>「メモ」アプリ</b>などに貼り付けて保存してください。</p>
+    
+    <textarea id="dataOutput" readonly onclick="this.select()"></textarea>
+    
+    <button onclick="document.getElementById('manualSaveArea').style.display='none'" style="margin-top:10px;">閉じる</button>
   </div>
 
-  <button class="btn-save" onclick="saveViaShare()">今の内容を保存する</button>
-
-  <button class="btn-load" onclick="document.getElementById('fileIn').click()">保存したデータを開く</button>
-  <input type="file" id="fileIn" style="display:none" onchange="loadData(event)">
+  <div style="margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px;">
+    <p style="font-size: 14px; font-weight: bold;">保存したデータを読み戻す場合：</p>
+    <p style="font-size: 13px;">メモアプリに保存した文字をここに貼り付けてください</p>
+    <textarea id="dataInput" style="height: 60px;" placeholder="ここにコピーした文字を貼り付け"></textarea>
+    <button class="btn-load" onclick="loadFromText()">貼り付けたデータで復元する</button>
+  </div>
 </div>
 
 <script>
-// iPhoneで最も確実に「ファイル保存場所」を指定させる方法
-async function saveViaShare() {
-    // 1. 入力内容をまとめる
+function showDataForManualSave() {
     const state = {
         c1: document.getElementById('check1').checked,
         m1: document.getElementById('memo1').value,
         date: new Date().toLocaleString()
     };
-    
-    const jsonStr = JSON.stringify(state, null, 2);
-    const blob = new Blob([jsonStr], { type: "application/json" });
-    
-    // 2. iPhoneに「ファイル」として認識させる
-    const file = new File([blob], "life-check.json", { type: "application/json" });
-
-    // 案内の表示
-    document.getElementById('guideArea').style.display = 'block';
-
-    try {
-        // 3. iPhone標準の「共有メニュー」を呼び出す
-        if (navigator.share) {
-            await navigator.share({
-                files: [file],
-                title: '終活データ保存',
-                text: 'マイライフチェックの記録です'
-            });
-            // 共有が終わったら案内を隠す
-            setTimeout(() => { document.getElementById('guideArea').style.display = 'none'; }, 2000);
-        } else {
-            alert("Safariブラウザで実行してください。");
-        }
-    } catch (err) {
-        // キャンセル時は案内を隠す
-        document.getElementById('guideArea').style.display = 'none';
-        console.log("保存がキャンセルされました");
-    }
+    // データを文字にして表示
+    document.getElementById('dataOutput').value = JSON.stringify(state);
+    document.getElementById('manualSaveArea').style.display = 'block';
+    document.getElementById('manualSaveArea').scrollIntoView({behavior: 'smooth'});
 }
 
-function loadData(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        const loaded = JSON.parse(ev.target.result);
+function loadFromText() {
+    try {
+        const text = document.getElementById('dataInput').value;
+        if(!text) { alert("文字を貼り付けてください"); return; }
+        const loaded = JSON.parse(text);
         document.getElementById('check1').checked = loaded.c1;
         document.getElementById('memo1').value = loaded.m1;
-        alert("読み込みが完了しました。");
-    };
-    reader.readAsText(file);
+        alert("読み込みに成功しました！");
+        document.getElementById('dataInput').value = ""; // クリア
+    } catch(err) {
+        alert("文字が正しくありません。コピーした内容をそのまま貼り付けてください。");
+    }
 }
 </script>
 </body>
