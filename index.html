@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>マイライフチェック</title>
+<title>終活チェックリスト（完全版）</title>
 
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 :root { --accent:#2b6cb0; }
@@ -38,7 +38,7 @@ nav.toc ul ul{ display:none; padding-left: 20px; border-top: 1px dashed #ddd; ma
 nav.toc li.active > ul{ display:block; }
 nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
 
-/* 本文エリア（参照通りの固定高さ） */
+/* 本文エリア（固定高さ） */
 .content{
   border:2px solid #e2e8f0; padding:0 15px; border-radius:8px; background: #fff;
   height: 600px; overflow-y: scroll; -webkit-overflow-scrolling: touch; position: relative; margin-top: 10px;
@@ -58,9 +58,9 @@ textarea{ width:100%; min-height:80px; margin-top: 10px; border: 1px solid #ccc;
 .desc{ display:none; background:#f9f9f9; padding:12px; margin-top:8px; border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; color: #444; }
 .desc-toggle{ color:#0056b3; cursor:pointer; font-size: 14px; text-decoration: underline; margin-top: 5px; display: inline-block; }
 
-/* ボタン：参照通りcontentの下、footerの上に配置 */
+/* 6ボタンエリア */
 .controls{ margin:20px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 110px; flex: 1; }
 
 .footer-info { margin-top: 40px; padding: 20px 0; text-align: left; }
 .info-text-bold { font-size: 18px; font-weight: bold; line-height: 1.6; display: block; margin-bottom: 20px; }
@@ -80,7 +80,7 @@ button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; bo
 
   <div class="main">
     <nav class="toc">
-      <p style="font-size: 13px; color: #888; margin-bottom: 8px;">▼クリックで章を開閉します（勝手にスクロールしません）</p>
+      <p style="font-size: 13px; color: #888; margin-bottom: 8px;">▼クリックで章を開閉（勝手にスクロールしません）</p>
       <ul id="tocList"></ul>
     </nav>
     <div class="content" id="contentArea"></div>
@@ -97,40 +97,27 @@ button{ padding:10px 15px; background:var(--accent); color:#fff; border:none; bo
 
   <div class="footer-info">
     <span class="info-text-bold">
-      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。
+      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。
     </span>
-    
     <p><br></p>
     <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: auto; max-width: 100%;">
     <p><br></p>
-    
-    <div style="text-align: center;">
-      <span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span>
-    </div>
-    
-    <p style="text-align: center;">
-      <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;">
-    </p>
-    
+    <div style="text-align: center;"><span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span></div>
+    <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;"></p>
     <div style="text-align: center; margin-bottom: 50px;">
       <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none;">
-        <span style="font-size: 20px; color: rgb(0, 0, 255); font-weight: bold; border-bottom: 1px solid blue;">
-          https://life-supporter.jp/lp/HRSuykFf
-        </span>
+        <span style="font-size: 20px; color: blue; font-weight: bold; border-bottom: 1px solid blue;">https://life-supporter.jp/lp/HRSuykFf</span>
       </a>
     </div>
   </div>
 
   <input type="file" id="jsonFile" style="display:none">
-  <input type="file" id="excelFile" style="display:none">
+  <input type="file" id="excelFile" style="display:none" accept=".xlsx,.xls">
 </div>
 
 <script>
-// 解説文章データ（長文のため前回提供分を全てここに統合してください）
-const DESC = {
-  "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です...（省略）",
-  /* ...ここに全てのDESCデータを貼り付け... */
-};
+// --- 解説文（DESC）省略版（実際は流用してください） ---
+const DESC = { "ch1-0": "銀行口座の一覧作成...（中略）" };
 
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
@@ -143,12 +130,13 @@ const chapters = [
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "shukatsu-checker-v2";
+const STORAGE_KEY = "life-checker-final-v1";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
 function render(){
   const c = document.getElementById("contentArea");
+  const scrollTop = c.scrollTop; // スクロール位置を保持
   c.innerHTML = "";
   chapters.forEach(ch => {
     const title = document.createElement("div");
@@ -165,21 +153,16 @@ function render(){
       div.className = "item" + (state[key].checked?" checked":"") + (state[key].memo?" has-memo":"");
       div.id = key;
       div.innerHTML = `
-        <input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b>
+        <label><input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b></label>
         <div class="desc-toggle">▼ 解説を見る</div>
-        <div class="desc">${DESC[key] || "解説準備中..."}</div>
+        <div class="desc">${DESC[key] || "解説文の詳細は前回データを使用してください"}</div>
         <textarea placeholder="メモを入力...">${state[key].memo || ""}</textarea>
       `;
       
       const cb = div.querySelector("input");
       const ta = div.querySelector("textarea");
-      
       cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
-      // メモ入力時に即時保存
       ta.oninput = () => { state[key].memo = ta.value; save(); };
-      // フォーカスが外れたらTOC（黒丸表示）を更新
-      ta.onblur = () => { buildTOC(); render(); };
-      
       div.querySelector(".desc-toggle").onclick = () => {
         const d = div.querySelector(".desc");
         d.style.display = (d.style.display === "block") ? "none" : "block";
@@ -187,6 +170,7 @@ function render(){
       c.appendChild(div);
     });
   });
+  c.scrollTop = scrollTop;
 }
 
 function buildTOC(){
@@ -197,12 +181,10 @@ function buildTOC(){
     let done = 0;
     ch.items.forEach((it, i) => { if(state[idFor(ch.id, i)]?.checked) done++; });
     const percent = Math.round(done / ch.items.length * 100);
-    
     const a = document.createElement("a");
     a.innerHTML = `${ch.title} <span style="color:red">●</span> ${percent}%`;
     a.onclick = (e) => { e.preventDefault(); li.classList.toggle("active"); };
     li.appendChild(a);
-    
     const sub = document.createElement("ul");
     ch.items.forEach((it, i) => {
       const key = idFor(ch.id, i);
@@ -223,12 +205,22 @@ function buildTOC(){
 
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-function downloadBackup(){
-  const blob = new Blob([JSON.stringify(state)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "life_check_data.json";
-  a.click();
+// 【修正】スマホでも動くデータ保存
+async function downloadBackup(){
+  const dataStr = JSON.stringify(state, null, 2);
+  const blob = new Blob([dataStr], {type:"application/json"});
+  const fileName = "life_check_data.json";
+  
+  if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+    const file = new File([blob], fileName, {type: "application/json"});
+    try { await navigator.share({ files: [file], title: "データの保存" }); } 
+    catch(e) { console.log("Share failed", e); }
+  } else {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    a.click();
+  }
 }
 
 function loadJSON(){ document.getElementById("jsonFile").click(); }
@@ -239,18 +231,19 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.readAsText(file);
 };
 
+// 【修正】Excel出力（確実に動作する形式）
 function exportExcel(){
   const data = [];
   chapters.forEach(ch => {
     ch.items.forEach((it, i) => {
       const key = idFor(ch.id, i);
-      data.push({ 章: ch.title, 項目: it, 完了: state[key]?.checked?"〇":"", メモ: state[key]?.memo||"" });
+      data.push({ "章": ch.title, "チェック項目": it, "完了": state[key]?.checked?"〇":"", "メモ": state[key]?.memo||"" });
     });
   });
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "CheckList");
-  XLSX.writeFile(wb, "life_check_export.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "終活チェックリスト");
+  XLSX.writeFile(wb, "shukatsu_checklist.xlsx");
 }
 
 function importExcel(){ document.getElementById("excelFile").click(); }
@@ -263,11 +256,13 @@ document.getElementById("excelFile").onchange = (e) => {
     data.forEach(row => {
       chapters.forEach(ch => {
         ch.items.forEach((it, i) => {
-          if(it === row.項目) state[idFor(ch.id, i)] = { checked: row.完了 === "〇", memo: row.メモ || "" };
+          if(it === (row.チェック項目 || row.項目)) {
+            state[idFor(ch.id, i)] = { checked: row.完了 === "〇", memo: row.メモ || "" };
+          }
         });
       });
     });
-    save(); render(); buildTOC();
+    save(); render(); buildTOC(); alert("Excelから読み込みました");
   };
   reader.readAsBinaryString(file);
 }
