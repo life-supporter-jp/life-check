@@ -47,7 +47,6 @@ button {
 .save-guide { 
   display: none; background: #fff5f5; border: 2px solid #e53e3e; 
   padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center;
-  font-weight: bold; color: #e53e3e;
 }
 
 /* 目次エリア */
@@ -79,12 +78,12 @@ nav.toc li > a {
 
 textarea { 
   width: 100%; min-height: 80px; margin-top: 10px; border: 1px solid #ccc; 
-  border-radius: 4px; padding: 8px; font-size: 16px; font-family: inherit;
+  border-radius: 4px; padding: 8px; font-size: 16px; 
 }
 
 .desc { 
   display: none; background: #f9f9f9; padding: 12px; margin-top: 8px; 
-  border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; color: #444;
+  border-radius: 4px; border: 1px dotted #ccc; font-size: 15px; line-height: 1.6; 
 }
 .desc-toggle { 
   color: #0056b3; cursor: pointer; font-size: 14px; text-decoration: underline; 
@@ -130,7 +129,7 @@ textarea {
 
   <div class="footer-info">
     <span class="info-text-bold">
-      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。
+      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。
     </span>
     <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="max-width: 100%;"></p>
     <div style="text-align: center; margin-top: 20px;">
@@ -145,36 +144,12 @@ textarea {
 </div>
 
 <script>
-// --- 解説データ (DESC) ---
+// --- 解説データ ---
 const DESC = {
   "ch1-0": "銀行口座の一覧を作成することは、終活における基本中の基本です。通帳の場所やネット銀行の有無を明確にしましょう。",
-  "ch1-1": "預金通帳やキャッシュカードがどこにあるか家族が把握できるように整理しましょう。",
-  "ch1-2": "年金の受給手続きや種類を確認し、家族がスムーズに手続きできるようにします。",
-  "ch1-3": "保険契約の内容と受取人を整理し、もしもの時に請求漏れがないようにします。",
-  "ch1-4": "株式や不動産などの資産情報をまとめ、相続の手続きを円滑にします。",
-  "ch1-5": "負債やローンの情報を明記することは、相続放棄の判断材料としても重要です。",
-  "ch1-6": "公共料金や定期的な引き落としサービスをリスト化し、解約漏れを防ぎます。",
-  "ch1-7": "自分の資産の全体像を把握するために、財産目録を作成しましょう。",
-  "ch1-8": "将来かかる相続税の目安を知り、事前の対策を検討します。",
-  "ch1-9": "誰に何を譲りたいか、自分の希望を整理しておくことがトラブル防止に繋がります。",
-  
-  "ch2-0": "介護が必要になった際、自宅か施設か、どのようなケアを望むか記録します。",
-  "ch2-1": "あらかじめ施設の種類や費用を調べておくと、家族の負担が軽減されます。",
-  "ch2-5": "緊急時に誰に連絡してほしいか、優先順位を含めたリストを作成します。",
-  "ch2-9": "将来的に住み替えるか、リフォームするかなど住まいの構想を立てます。",
-
-  "ch3-3": "延命治療を望むかどうかなど、自分の意思を明確に記しておきましょう。",
-  "ch3-5": "急な入院に備えて、保険証や洗面用具などのセットを準備しておくと安心です。",
-
-  "ch4-0": "エンディングノートは、大切な人へ想いを伝える最も身近な手段です。",
-  "ch4-5": "SNSやスマホのデータなど、デジタル上の遺品をどう扱うか決めましょう。",
-
-  "ch5-0": "葬儀の形式や規模について、自分の希望を書き留めておきます。",
-  "ch5-6": "遺影に使ってほしいお気に入りの写真を用意しておきましょう。",
-
-  "ch6-0": "スマホのパスコードは、デジタル遺品のトラブルで最も多い問題です。安全な伝え方を考えましょう。",
-  "ch6-1": "各種サービスのID・パスワードを一覧にし、信頼できる場所に保管します。",
-  "ch6-3": "有料の定期購入（サブスク）は、死後も引き落としが続くためリスト化が必須です。"
+  "ch1-1": "預金通帳やカードがどこにあるか家族が把握できるように整理しましょう。",
+  "ch6-0": "スマホのロック解除情報は重要です。デジタル遺品トラブルを避けるために準備しましょう。",
+  // 他の項目も必要に応じて追加可能
 };
 
 // --- 章データ ---
@@ -189,11 +164,11 @@ const chapters = [
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-check-final-unified-storage";
+const STORAGE_KEY = "life-check-final-storage";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
-// --- 保存・共有処理 (JSON) ---
+// --- 保存・共有処理 ---
 async function downloadBackup() {
   const dataStr = JSON.stringify(state, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
@@ -203,7 +178,7 @@ async function downloadBackup() {
     try {
       const file = new File([blob], fileName, { type: "application/json" });
       document.getElementById('saveGuide').style.display = 'block';
-      await navigator.share({ files: [file], title: 'ライフチェック保存データ' });
+      await navigator.share({ files: [file], title: 'My Life Check JSON' });
     } catch (e) {}
     setTimeout(() => { document.getElementById('saveGuide').style.display = 'none'; }, 3000);
   } else {
@@ -216,7 +191,6 @@ async function downloadBackup() {
   }
 }
 
-// --- 保存・共有処理 (Excel) ---
 async function exportExcel() {
   const data = [];
   chapters.forEach(ch => {
@@ -235,7 +209,7 @@ async function exportExcel() {
   if (navigator.share && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     try {
       const file = new File([blob], fileName, { type: blob.type });
-      await navigator.share({ files: [file], title: 'ライフチェックExcel出力' });
+      await navigator.share({ files: [file], title: 'My Life Check Excel' });
     } catch (e) {}
   } else {
     const url = URL.createObjectURL(blob);
@@ -255,8 +229,8 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.onload = () => {
     try {
       state = JSON.parse(reader.result);
-      saveToLocal(); render(); buildTOC(); alert("読み込みました。");
-    } catch(err) { alert("正しいファイル形式ではありません。"); }
+      save(); render(); buildTOC(); alert("読み込みました。");
+    } catch(err) { alert("無効なファイルです。"); }
   };
   reader.readAsText(file);
 };
@@ -277,16 +251,15 @@ document.getElementById("excelFile").onchange = (e) => {
           });
         });
       });
-      saveToLocal(); render(); buildTOC(); alert("Excelから読み込みました。");
+      save(); render(); buildTOC(); alert("Excelから読み込みました。");
     } catch(err) { alert("Excel読込に失敗しました。"); }
   };
   reader.readAsBinaryString(file);
 }
 
-// --- 画面描画 ---
+// --- メイン描画処理 ---
 function render(){
   const c = document.getElementById("contentArea");
-  const currentScroll = c.scrollTop;
   c.innerHTML = "";
   chapters.forEach(ch => {
     const title = document.createElement("div");
@@ -310,8 +283,8 @@ function render(){
       
       const cb = div.querySelector("input");
       const ta = div.querySelector("textarea");
-      cb.onchange = () => { state[key].checked = cb.checked; saveToLocal(); render(); buildTOC(); };
-      ta.oninput = () => { state[key].memo = ta.value; saveToLocal(); buildTOC(); };
+      cb.onchange = () => { state[key].checked = cb.checked; save(); render(); buildTOC(); };
+      ta.oninput = () => { state[key].memo = ta.value; save(); buildTOC(); };
       div.querySelector(".desc-toggle").onclick = () => {
         const d = div.querySelector(".desc");
         d.style.display = (d.style.display === "block") ? "none" : "block";
@@ -319,7 +292,6 @@ function render(){
       c.appendChild(div);
     });
   });
-  c.scrollTop = currentScroll;
 }
 
 function buildTOC(){
@@ -347,7 +319,7 @@ function buildTOC(){
   });
 }
 
-function saveToLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function toggleFilter(){ filterMode = !filterMode; render(); }
 
 // 初期化
