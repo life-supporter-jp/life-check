@@ -3,135 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>終活チェックリスト（iPhone確実保存版）</title>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<title>終活チェックリスト</title>
 <style>
-:root { --accent:#2b6cb0; }
-* { box-sizing: border-box; }
-body{ font-family:sans-serif; margin: 0; padding: 0; font-size:18px; color: #333; background-color: #f0f2f5; }
-.wrap{ max-width: 800px; margin: 0 auto; background-color: #fff; padding: 20px; }
-.main{ display:flex; flex-direction:column; gap:16px; }
-nav.toc{ border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa; }
-nav.toc ul{ list-style:none; padding-left:0; }
-nav.toc li > a { cursor: pointer; text-decoration: none; color: var(--accent); display: block; padding: 10px 0; font-weight: bold; border-bottom: 1px solid #eee; }
-.content{ border:2px solid #e2e8f0; padding:15px; border-radius:8px; height: 500px; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
-.chapter-title{ font-size:20px; font-weight:bold; margin:20px 0 10px; border-left: 6px solid var(--accent); padding-left:10px; background:#f0f4f8; position:sticky; top:0; }
-.item{ padding:15px 0; border-bottom:1px solid #eee; }
-.item.checked{ background:#e6ffe6; }
-textarea{ width:100%; min-height:60px; margin-top:10px; }
-
-/* ボタンエリア */
-.controls{ margin:20px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content: center; }
-button{ padding:12px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; flex: 1 1 40%; }
-
-/* iPhone用コピーエリア */
-#copyArea { display:none; position:fixed; top:10%; left:5%; width:90%; height:80%; background:white; border:2px solid #333; z-index:1000; padding:20px; box-shadow:0 0 20px rgba(0,0,0,0.5); border-radius:10px; }
-#copyText { width:100%; height:70%; margin-bottom:10px; font-family:monospace; font-size:12px; }
+  body { font-family: sans-serif; padding: 20px; line-height: 1.6; background: #f0f2f5; }
+  .wrap { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #ccc; }
+  .btn-save { background: #e53e3e; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+  .btn-load { background: #718096; color: white; padding: 10px; width: 100%; border: none; border-radius: 8px; margin-top: 10px; }
+  .status-area { margin: 15px 0; padding: 15px; background: #fff5f5; border: 2px dashed #e53e3e; border-radius: 8px; text-align: center; display: none; }
+  .item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+  h2 { text-align: center; color: #2b6cb0; }
+  .guide { font-size: 14px; color: #666; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <div class="main">
-    <nav class="toc"><ul id="tocList"></ul></nav>
-    <div class="content" id="contentArea"></div>
+  <h2>マイライフチェック</h2>
+  <p class="guide">※入力した内容は、下のボタンで保存できます。</p>
+
+  <div id="itemList">
+    <div class="item">
+      <input type="checkbox" id="item1"> <label for="item1"><b>銀行口座の整理</b></label><br>
+      <textarea id="memo1" style="width:100%;" placeholder="メモを入力"></textarea>
+    </div>
   </div>
 
-  <div class="controls">
-    <button onclick="toggleFilter()" style="background: #555;">未完了のみ</button>
-    <button onclick="showBackupArea()" style="background: #e53e3e;">データ保存・コピー</button>
-    <button onclick="loadJSON()" style="background: #718096;">データ読込</button>
-    <button onclick="exportExcel()">Excel出力</button>
-    <button onclick="window.print()" style="background: #1a202c;">印刷</button>
+  <div id="saveStep" class="status-area">
+    <p style="margin:0 0 10px 0;">保存するファイル名：<br><b style="font-size:20px; color:#000;">life-check.json</b></p>
+    <button class="btn-save" onclick="execDownload()">↑ この名前で保存を確定する</button>
+    <p style="font-size:12px; color: #666; margin-top:10px;">※ボタンを押した後、画面に出る「許可」や「ダウンロード」を押してください。</p>
   </div>
 
-  <div id="copyArea">
-    <h3 style="margin-top:0;">バックアップデータ</h3>
-    <p style="font-size:14px; color:red;">下の枠内を長押しして「すべて選択」→「コピー」し、iPhoneの「メモ」アプリ等に貼り付けて保存してください。</p>
-    <textarea id="copyText" readonly></textarea>
-    <button onclick="closeBackupArea()" style="background:#555; width:100%;">閉じる</button>
-  </div>
+  <button id="mainSaveBtn" class="btn-save" onclick="prepareSave()">内容を保存する</button>
+  
+  <button class="btn-load" onclick="document.getElementById('fileInput').click()">保存したファイルを読み込む</button>
+  <input type="file" id="fileInput" style="display:none" onchange="loadFile(event)">
 
-  <input type="file" id="jsonFile" style="display:none">
+  <p style="font-size:13px; color:#888; margin-top:20px;">
+    【保存した場所の探し方】<br>
+    iPhoneのホーム画面にある青いフォルダの形をした<b>「ファイル」アプリ</b>の中に保存されます。
+  </p>
 </div>
 
 <script>
-const chapters = [
-  { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧","通帳・カード整理","年金手続き","保険整理","資産情報","借金・ローン","公共料金","財産目録","相続税試算","遺産分割希望"]},
-  { id:2, title:"第2章 介護・サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡先","身元保証人","介護費用試算","感謝の手紙","住まい"]}
-];
-
-let state = JSON.parse(localStorage.getItem("shukatsu-save") || "{}");
-
-function idFor(chId, i){ return "ch" + chId + "-" + i; }
-
-function render(){
-  const c = document.getElementById("contentArea");
-  c.innerHTML = "";
-  chapters.forEach(ch => {
-    const title = document.createElement("div");
-    title.className = "chapter-title";
-    title.textContent = ch.title;
-    c.appendChild(title);
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      if(!state[key]) state[key] = {checked:false, memo:""};
-      const div = document.createElement("div");
-      div.className = "item" + (state[key].checked?" checked":"");
-      div.innerHTML = `
-        <input type="checkbox" ${state[key].checked?"checked":""}> <b>${it}</b><br>
-        <textarea placeholder="メモ...">${state[key].memo || ""}</textarea>
-      `;
-      div.querySelector("input").onchange = (e) => { state[key].checked = e.target.checked; save(); render(); };
-      div.querySelector("textarea").oninput = (e) => { state[key].memo = e.target.value; save(); };
-      c.appendChild(div);
-    });
-  });
+// 保存の準備ステップ
+function prepareSave() {
+  document.getElementById('saveStep').style.display = 'block';
+  document.getElementById('mainSaveBtn').style.display = 'none';
+  // 画面を保存エリアまで自動スクロール
+  document.getElementById('saveStep').scrollIntoView({behavior: 'smooth'});
 }
 
-function save(){ localStorage.setItem("shukatsu-save", JSON.stringify(state)); }
-
-// iPhoneで確実にデータを出すための関数
-function showBackupArea() {
-  const dataStr = JSON.stringify(state, null, 2);
-  document.getElementById("copyText").value = dataStr;
-  document.getElementById("copyArea").style.display = "block";
+// 実際のダウンロード実行
+function execDownload() {
+  // 保存するデータを作成
+  const data = {
+    check1: document.getElementById('item1').checked,
+    memo1: document.getElementById('memo1').value,
+    date: new Date().toLocaleString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  
+  a.href = url;
+  a.download = "life-check.json"; // 指定のファイル名
+  document.body.appendChild(a);
+  a.click();
+  
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    // 元に戻す
+    alert("保存の指示を出しました。\n画面に「ダウンロードしますか？」と出たら許可を押してください。");
+    document.getElementById('saveStep').style.display = 'none';
+    document.getElementById('mainSaveBtn').style.display = 'block';
+  }, 500);
 }
 
-function closeBackupArea() {
-  document.getElementById("copyArea").style.display = "none";
+// 読み込み処理
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = JSON.parse(e.target.result);
+    document.getElementById('item1').checked = data.check1;
+    document.getElementById('memo1').value = data.memo1;
+    alert("読み込みました。");
+  };
+  reader.readAsText(file);
 }
-
-// データ読み込み（メモ帳から貼り付けたものを復元する用）
-function loadJSON(){
-  const input = prompt("保存したバックアップテキスト（文字の塊）をここに貼り付けてください。");
-  if (input) {
-    try {
-      state = JSON.parse(input);
-      save(); render();
-      alert("読み込みが完了しました。");
-    } catch(e) {
-      alert("データの形式が正しくありません。");
-    }
-  }
-}
-
-// Excel出力（iPhoneのSafariはこれが限界の場合が多いです）
-function exportExcel(){
-  const data = [];
-  chapters.forEach(ch => {
-    ch.items.forEach((it, i) => {
-      const key = idFor(ch.id, i);
-      data.push({ 章: ch.title, 項目: it, 完了: state[key].checked ? "〇" : "", メモ: state[key].memo });
-    });
-  });
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "終活");
-  XLSX.writeFile(wb, "shukatsu.xlsx");
-}
-
-render();
 </script>
+
 </body>
 </html>
