@@ -63,6 +63,7 @@ textarea{
 button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor: pointer; font-weight: bold; font-size: 14px; min-width: 120px; flex: 1; }
 
 .footer-info { margin-top: 40px; padding: 20px 0; text-align: left; }
+.info-text { font-size: 18px; font-weight: bold; line-height: 1.8; color: #333; }
 </style>
 </head>
 <body>
@@ -94,13 +95,25 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
   </div>
 
   <div class="footer-info">
-    <p style="font-size: 18px; font-weight: bold;">今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。</p>
-    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: 20px auto; max-width: 100%;">
-    <div style="text-align: center;"><span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span></div>
-    <p style="text-align: center;"><img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;"></p>
+    <div class="info-text">
+      今回のアプリは如何だったでしょうか？他にも使えるアプリ、脳トレができるゲームや趣味に俳句、和歌などが利用できるサイトをご案内します。また大事な記録をサーバーに残せるサイトで、何かあった時に情報開示も指定できるサイトです。スマホのID、PWを記録しておくと安心です。
+    </div>
+    
+    <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012085.jpg" style="display: block; margin: 30px auto; max-width: 100%;">
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <span style="font-size: 24px;"><b>以下より体験版をご確認ください。</b></span>
+    </div>
+    
+    <p style="text-align: center;">
+      <img src="https://life-supporter.jp/sp/hxySQ4ff/ct5NJq8Z/images/XS012100.jpg" style="width: 200px;">
+    </p>
+    
     <div style="text-align: center; margin-bottom: 50px;">
       <a href="https://life-supporter.jp/lp/HRSuykFf" style="text-decoration:none;">
-        <span style="font-size: 20px; color: blue; font-weight: bold; border-bottom: 1px solid blue;">https://life-supporter.jp/lp/HRSuykFf</span>
+        <span style="font-size: 20px; color: blue; font-weight: bold; border-bottom: 1px solid blue;">
+          https://life-supporter.jp/lp/HRSuykFf
+        </span>
       </a>
     </div>
   </div>
@@ -110,7 +123,9 @@ button{ padding:12px 10px; background:var(--accent); color:#fff; border:none; bo
 </div>
 
 <script>
+// --- 解説データ ---
 const DESC = { "ch1-0": "銀行口座の一覧作成...（略）" };
+
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧作成","預金通帳・カード整理","年金受給手続き確認","保険契約の整理","株式・不動産情報","借金・ローンの明記","公共料金・サブスク","財産目録の作成","相続税の試算","遺産分割の希望"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望記録","介護施設候補リスト","介護保険サービス確認","見守り・支援登録","家事・買い物支援","緊急連絡網リスト","身元保証人の確保","介護費用の試算","感謝の手紙","将来の住まい決定"]},
@@ -122,7 +137,7 @@ const chapters = [
 
 let state = {};
 let filterMode = false;
-const STORAGE_KEY = "life-checker-master-v1";
+const STORAGE_KEY = "life-checker-final-v100";
 
 function idFor(chId, i){ return "ch" + chId + "-" + i; }
 
@@ -222,10 +237,10 @@ document.getElementById("jsonFile").onchange = (e) => {
   reader.readAsText(file);
 };
 
-// 【最終修正：Excel出力の安定性を極限まで高めた記述】
+// 【重要】Excel出力をスマホでも強制的に発火させるロジック
 function exportExcel(){
   if (typeof XLSX === 'undefined') {
-    alert("Excel機能を準備中です。5秒ほど待ってから再度お試しください。");
+    alert("準備中です。数秒待って再度お試しください。");
     return;
   }
   try {
@@ -239,10 +254,25 @@ function exportExcel(){
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "LifeCheck");
-    // 書き出し実行：ブラウザのDL機能を直接呼び出す
-    XLSX.writeFile(wb, "life-check.xlsx");
+    
+    // スマホでのダウンロードを最も確実に実行する方法
+    const wbout = XLSX.write(wb, {bookType:'xlsx', type:'binary'});
+    function s2ab(s) {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+      return buf;
+    }
+    const blob = new Blob([s2ab(wbout)], {type:"application/octet-stream"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "life-check.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   } catch(err) {
-    alert("出力エラー: " + err.message);
+    alert("エラー: " + err.message);
   }
 }
 
@@ -253,12 +283,11 @@ document.getElementById("excelFile").onchange = (e) => {
   reader.onload = (evt) => {
     const data = new Uint8Array(evt.target.result);
     const wb = XLSX.read(data, {type:"array"});
-    const firstSheet = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(firstSheet);
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     rows.forEach(row => {
       chapters.forEach(ch => {
         ch.items.forEach((it, i) => {
-          if(it === row.項目) {
+          if(it === (row.項目 || row.チェック項目)) {
             state[idFor(ch.id, i)] = { checked: row.状況 === "完了", memo: row.メモ || "" };
           }
         });
