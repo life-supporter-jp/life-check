@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>終活チェックリスト（スマホ保存・Excel読込対応）</title>
+<title>終活チェックリスト（完全動作版）</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -17,9 +17,10 @@ body{ font-family:sans-serif; margin:0; padding:0; background:#f0f2f5; font-size
 
 .banner-container img { max-width:100%; height:auto; border-radius:8px; display:block; margin:0 auto; }
 
+/* メインレイアウト */
 .main { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 
-/* 目次 */
+/* 目次（章の開閉） */
 nav.toc { border: 2px solid var(--accent); border-radius: 8px; padding: 12px; background: #fafafa; }
 nav.toc ul { list-style: none; padding: 0; margin: 0; }
 nav.toc li { border-bottom: 1px solid #eee; }
@@ -29,7 +30,7 @@ nav.toc li.active a::after { content: "▲"; }
 nav.toc ul ul { display: none; padding-left: 15px; background: #fff; }
 nav.toc li.active ul { display: block; }
 
-/* コンテンツエリア */
+/* 本文エリア */
 .content { border: 2px solid #e2e8f0; border-radius: 8px; height: 500px; overflow-y: scroll; padding: 15px; -webkit-overflow-scrolling: touch; }
 .chapter-title { background: #f0f4f8; padding: 10px; font-weight: bold; position: sticky; top: 0; border-left: 6px solid var(--accent); margin: 20px 0 10px; z-index: 10; }
 
@@ -37,7 +38,7 @@ nav.toc li.active ul { display: block; }
 .item.checked { background: #e6ffe6; border-left: 4px solid #4caf50; padding-left: 10px; }
 textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
 
-/* 操作ボタン（スマホで押しやすいサイズ） */
+/* ボタンエリア */
 .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 25px 0; padding-top: 15px; border-top: 2px solid #eee; }
 button { flex: 1 1 140px; max-width: 200px; padding: 15px 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
 
@@ -79,6 +80,7 @@ button { flex: 1 1 140px; max-width: 200px; padding: 15px 10px; background: var(
 </div>
 
 <script>
+// データ定義
 const chapters = [
   { id:1, title:"第1章 お金と財産管理", items:["銀行口座の一覧","通帳・キャッシュカード","年金手続き","保険契約","株式・不動産","借金・ローン","公共料金","財産目録","相続税試算","遺産分割"]},
   { id:2, title:"第2章 介護・生活サポート", items:["介護の希望","施設候補","介護保険","見守りサービス","家事支援","緊急連絡網","身元保証人","介護費用","感謝の手紙","住まいの決定"]},
@@ -88,10 +90,11 @@ const chapters = [
   { id:6, title:"第6章 デジタル遺産", items:["スマホロック解除","パスワード保管","ネット銀行","サブスク解約","SNS対応","クラウド写真","電子マネー","暗号資産","非公開データ","ネットの友人"]}
 ];
 
-const STORAGE_KEY = "shukatsu_v6_save";
+const STORAGE_KEY = "shukatsu_v7_final";
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
 let filterMode = false;
 
+// 描画
 function render() {
   const container = document.getElementById("contentArea");
   const pos = container.scrollTop;
@@ -118,6 +121,7 @@ function render() {
   container.scrollTop = pos;
 }
 
+// 目次作成
 function buildTOC() {
   const list = document.getElementById("tocList");
   list.innerHTML = "";
@@ -138,6 +142,7 @@ function buildTOC() {
   });
 }
 
+// データ更新
 function update(key, prop, val) { 
   state[key][prop] = val; 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -146,7 +151,7 @@ function update(key, prop, val) {
 
 function toggleFilter() { filterMode = !filterMode; render(); }
 
-// --- スマホ保存処理 ---
+// --- スマホでのファイル保存（ダウンロード） ---
 function downloadBackup() {
   try {
     const data = JSON.stringify(state, null, 2);
@@ -154,13 +159,15 @@ function downloadBackup() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "shukatsu_data.json";
+    a.download = "shukatsu_backup.json";
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 100);
   } catch (e) {
-    alert("保存に失敗しました。ブラウザの設定を確認してください。");
+    alert("保存に失敗しました。標準のブラウザ（ChromeやSafari）を使用してください。");
   }
 }
 
@@ -169,18 +176,15 @@ function handleFile(e) {
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  
-  const extension = file.name.split('.').pop().toLowerCase();
+  const ext = file.name.split('.').pop().toLowerCase();
 
-  if (extension === "xlsx" || extension === "xls") {
-    // Excel読込
+  if (ext === "xlsx" || ext === "xls") {
+    // Excel読み込み処理
     reader.onload = (evt) => {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, {type:'binary'});
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
+      const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
-      // Excelからstateへの変換ロジック（簡易版）
       data.forEach(row => {
         if(row.ID) {
           state[row.ID] = { checked: row.完了 === "〇", memo: row.メモ || "" };
@@ -192,19 +196,20 @@ function handleFile(e) {
     };
     reader.readAsBinaryString(file);
   } else {
-    // JSON読込
+    // JSON読み込み処理
     reader.onload = (evt) => {
       try {
         state = JSON.parse(evt.target.result);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         render(); buildTOC();
         alert("データを読み込みました");
-      } catch(err) { alert("正しいファイル形式ではありません"); }
+      } catch(err) { alert("正しいデータ形式ではありません"); }
     };
     reader.readAsText(file);
   }
 }
 
+// Excel出力
 function exportExcel() {
   const rows = Object.keys(state).map(k => ({ ID: k, 完了: state[k].checked ? "〇" : "", メモ: state[k].memo }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -213,6 +218,7 @@ function exportExcel() {
   XLSX.writeFile(wb, "shukatsu_list.xlsx");
 }
 
+// 初期化実行
 render();
 buildTOC();
 </script>
